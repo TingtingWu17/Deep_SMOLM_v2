@@ -33,7 +33,7 @@ clc;
 
 % give the save address for generated data
 % ********************************
-save_folder = 'C:\Users\wu.t\OneDrive - Washington University in St. Louis\github\data for Deep-SMOLM\validation_20210331_2SM_fixed\'; 
+save_folder = '/home/wut/Documents/Deep-SMOLM/data/opt_PSF_data_1000vs2/validation_20220121_2SM_fixed_v2_seperation1to20_signal1000_gamma1/'; 
 % ********************************
 image_size = 56;  % the pixel size of the simulation image (feel free to change it)
 upsampling_ratio  = 6;
@@ -41,7 +41,8 @@ pmask = 'pixOL_v12.bmp';
 basis_matrix_opt = forward_model_opt(pmask, image_size);
 pixel_size = 58.6; %in unit of um
 
-distance_differ_set = [1,2,3,4,5,6,7,8,9,10]; %in unit of pixel
+distance_differ_set = linspace(1,1000,30)/pixel_size; %in unit of pixel
+frame_per_state = 1000;
 %% user defined parameters
 %% gaussian filter
 h_shape = [7,7];
@@ -57,8 +58,9 @@ background=2 ; %(feel free to change it)
 signal_sigma = 80;
 
 kk=0;
-for ii = 1:200*length(distance_differ_set)  %each 4 images, and total 2000*4 images
-if rem(ii-1,200)==0
+%
+for ii = 1:frame_per_state*length(distance_differ_set)  %each 4 images, and total 2000*4 images
+if rem(ii-1,frame_per_state)==0
    ii
    kk=kk+1;
    kk
@@ -71,24 +73,32 @@ image_GT_up = zeros(5,image_size*upsampling_ratio,image_size*upsampling_ratio);
 
 n_SMs = 2; % number of single molecules
 [thetaD_SMs,phiD_SMs,gamma_SMs] = generate_rand_angleD(n_SMs);
+gamma_SMs(:)=1;
 %theta angle of SMs, note theta is in the range of (0,90) degree
 %phi angle of SMs, note phi is in the range of (0,360) degree
 %gamma (orientaiton constraint) is used to represent alpha angle. it is in the range of (0,1)
 
 
-x_SMs1 = (0.9999*rand(1)-1/2)/upsampling_ratio; %x location, in unit of pixles
-y_SMs1 = (0.9999*rand(1)-1/2)/upsampling_ratio;%y location, in unit of pixles
+x_SMs1 = (1*rand(1)-1/2); %x location, in unit of pixles
+y_SMs1 = (1*rand(1)-1/2);%y location, in unit of pixles
 angle = rand(1)*360;
 x_dif = distance_differ_set(kk)*cosd(angle);
 y_dif = distance_differ_set(kk)*sind(angle);
 x_SMs2 = x_SMs1+x_dif;
 y_SMs2 = y_SMs1+y_dif;
+x_mean = (x_SMs1+x_SMs2)/2;
+y_mean = (y_SMs1+y_SMs2)/2;
+x_SMs1 = x_SMs1-x_mean;
+x_SMs2 = x_SMs2-x_mean;
+y_SMs1 = y_SMs1-y_mean;
+y_SMs2 = y_SMs2-y_mean;
 
 x_SMs = [x_SMs1,x_SMs2];
 y_SMs = [y_SMs1,y_SMs2];
 
 temp = (poissrnd(3,1,100)+normrnd(0,1,1,100)-0.5)*350; temp(temp<100)=[];
-signal_SMs = temp(1:n_SMs);
+%signal_SMs = temp(1:n_SMs);
+signal_SMs = [1000,1000];
 x_SMs_phy = x_SMs*pixel_size;
 y_SMs_phy = y_SMs*pixel_size;
 
@@ -175,38 +185,21 @@ image_with_poission_up(1,:,:) = I_poissx_up;
 image_with_poission_up(2,:,:) = I_poissy_up;
 image_noiseless(1,:,:) = Ix;
 image_noiseless(2,:,:) = Iy;
-image_noiseless_up(1,:,:) = Ix_up;
-image_noiseless_up(2,:,:) = Iy_up;
-image_GT_up(1,:,:) = I_intensity_up;
-image_GT_up(2,:,:) = I_theta_up;
-image_GT_up(3,:,:) = I_phi_up;
-image_GT_up(4,:,:) = I_gamma_up;
-image_GT_up(5,:,:) = I_intensity_gaussian;
-image_GT_up(6,:,:) = I_sXX;
-image_GT_up(7,:,:) = I_sYY;
-image_GT_up(8,:,:) = I_sZZ;
-image_GT_up(9,:,:) = I_sXY;
-image_GT_up(10,:,:) = I_sXZ;
-image_GT_up(11,:,:) = I_sYZ;
-GT_list(1,:)=x_phy;
-GT_list(2,:)=y_phy;
-GT_list(3,:)=I_grd;
-GT_list(4,:)=thetaD_grd;
-GT_list(5,:)=phiD_grd;
-GT_list(6,:)=gamma_grd;
+GT_list(1,:)=ones(size(x_phy))*ii;
+GT_list(2,:)=x_phy;
+GT_list(3,:)=y_phy;
+GT_list(4,:)=I_grd;
+GT_list(5,:)=thetaD_grd;
+GT_list(6,:)=phiD_grd;
+GT_list(7,:)=gamma_grd;
 
-image_with_poission_bkgdRmvd = image_with_poission-background;
 image_with_poission_bkgdRmvd_up = image_with_poission_up-background;
 
 
 save([save_folder,'image_with_poission',num2str(ii),'.mat'],'image_with_poission');
-save([save_folder,'image_with_poission_up',num2str(ii),'.mat'],'image_with_poission_up');
-save([save_folder,'image_with_poission_bkgdRmvd',num2str(ii),'.mat'],'image_with_poission_bkgdRmvd');
 save([save_folder,'image_with_poission_bkgdRmvd_up',num2str(ii),'.mat'],'image_with_poission_bkgdRmvd_up');
-save([save_folder,'image_GT_up',num2str(ii),'.mat'],'image_GT_up');
 save([save_folder,'GT_list',num2str(ii),'.mat'],'GT_list');
 save([save_folder,'image_noiseless',num2str(ii),'.mat'],'image_noiseless');
-save([save_folder,'image_noiseless_up',num2str(ii),'.mat'],'image_noiseless_up');
 
 
 

@@ -4,7 +4,7 @@ This is an PyTorch implementation.
 ## Usage
 
 ```
-python train.py 
+python Deep_SMOLM_main.py 
 ```
 
 ## References

@@ -73,7 +73,7 @@ class CometWriter:
             self.timer.reset()
         else:
             duration = self.timer.check()
-            self.add_scalar({'steps_per_sec': 1 / duration})
+            #self.add_scalar({'steps_per_sec': 1 / duration})
 
     def log_hyperparams(self, params: Dict[str, Any]) -> None:
         self.experiment.log_parameters(params)

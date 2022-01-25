@@ -77,6 +77,7 @@ class MicroscopyDataLoader():
     
     def __getitem__(self,idx): # idx: index of the batches
         
+
         ID = self.list_IDs[idx]
         ID = str(ID)
         #print('*****'+ID)
@@ -111,7 +112,7 @@ class MicroscopyDataLoader():
         Output_channel = np.concatenate((intensity_grid,Intensity_mask,theta_grid,phi_grid,gamma_grid,intensity_gaussian,sXX,sYY,sZZ,sXY,sXZ,sYZ), axis = 0)
         Output_channel = Output_channel.astype('float32')   
             
-        return Input_channel, Output_channel
+        return Input_channel, Output_channel,self.list_IDs[idx]
         
     
 def normalize_im(im, dmean, dstd):

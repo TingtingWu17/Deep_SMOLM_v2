@@ -1,7 +1,8 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from base import BaseModel
+from abc import abstractmethod
+#from base import BaseModel
 
 
 # Model here
@@ -134,7 +135,9 @@ class UpConv(nn.Module):
         return x
 
 
-class UNet(BaseModel):
+
+
+class UNet(nn.Module):
     """ `UNet` class is based on https://arxiv.org/abs/1505.04597
     The U-Net is a convolutional encoder-decoder neural network.
     Contextual spatial information (from the decoding,
@@ -263,7 +266,7 @@ class UNet(BaseModel):
         for i, m in enumerate(self.modules()):
             self.weight_init(m)
 
-
+    
     def forward(self, x, verbose = False):
         encoder_outs = []
         intermediate_out_1 = []
@@ -312,6 +315,15 @@ class UNet(BaseModel):
             print('unet decoder output', x.shape)
 
         return x
+
+    
+    def __str__(self):
+        """
+        Model prints with number of trainable parameters
+        """
+        model_parameters = filter(lambda p: p.requires_grad, self.parameters())
+        params = sum([np.prod(p.size()) for p in model_parameters])
+        return super().__str__() + '\nTrainable parameters: {}'.format(params)
 
 
 

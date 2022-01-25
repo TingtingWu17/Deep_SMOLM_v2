@@ -6,7 +6,6 @@ from operator import getitem
 from datetime import datetime
 from logger import setup_logging
 from utils import read_json, write_json
-from IPython.core.debugger import set_trace
 
 
 class ConfigParser:
