@@ -278,8 +278,18 @@ def orientaitons_loss(spikes_pred, heatmap_true, scaling_factor):
     
     mse_M = F.mse_loss(muxx_true_blur, muxx_est)+F.mse_loss(muyy_true_blur, muyy_est)+F.mse_loss(muzz_true_blur, muzz_est)+F.mse_loss(muxy_true_blur, muxy_est)+F.mse_loss(muxz_true_blur, muxz_est)+F.mse_loss(muyz_true_blur, muyz_est)
 
+    #mse_M = 1.2472*F.mse_loss(muxx_true_blur, muxx_est)+1.2530*F.mse_loss(muyy_true_blur, muyy_est)+2.51*F.mse_loss(muzz_true_blur, muzz_est)+11.5102*F.mse_loss(muxy_true_blur, muxy_est)+1.3120*F.mse_loss(muxz_true_blur, muxz_est)+1.3149*F.mse_loss(muyz_true_blur, muyz_est)
+
     l1_M = F.l1_loss(torch.sqrt(muxx_true_blur**2+muyy_true_blur**2+muzz_true_blur**2+muxy_true_blur**2+muxz_true_blur**2+muyz_true_blur**2),torch.zeros(muyz_true_blur.shape).to(device))
 
-    loss = mse_M + l1_M
+    loss = mse_M 
 
-    return loss, [mse_M.data.cpu().item(), l1_M.data.cpu().item()]
+    lossI = F.mse_loss((muxx_true_blur+muyy_true_blur+muzz_true_blur)/3, (muxx_est+muyy_est+muzz_est)/3)
+    lossXX = F.mse_loss(muxx_true_blur, muxx_est)
+    lossYY = F.mse_loss(muyy_true_blur, muyy_est)
+    lossZZ = F.mse_loss(muzz_true_blur, muzz_est)
+    lossXY = F.mse_loss(muxy_true_blur, muxy_est)
+    lossXZ = F.mse_loss(muxz_true_blur, muxz_est)
+    lossYZ = F.mse_loss(muyz_true_blur, muyz_est)
+
+    return loss, [mse_M.data.cpu().item(), lossI.data.cpu().item(), lossXX.data.cpu().item(), lossYY.data.cpu().item(), lossZZ.data.cpu().item(), lossXY.data.cpu().item(), lossXZ.data.cpu().item(), lossYZ.data.cpu().item()]

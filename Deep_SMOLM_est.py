@@ -27,7 +27,6 @@ def main(config: ConfigParser):
     # parameters for the training and testing set
 
     params_est = {'batch_size':config['est_dataset']['batch_size'],'shuffle':False, 'num_workers':config['data_loader']['args']['num_workers']}
-    params_valid = {'batch_size':config['validation_dataset']['batch_size'],'shuffle':False, 'num_workers':config['data_loader']['args']['num_workers']}
 
     est_file_names = {'noise_image_name':config['est_dataset']['noise_image_name'],
     'GT_list_name':config['est_dataset']['GT_list_name'], 
@@ -35,21 +34,12 @@ def main(config: ConfigParser):
 'batch_size':config['est_dataset']['batch_size'],
 'setup_params':config['microscopy_params']['setup_params']}
 
-    vallidation_file_names = {'noise_image_name':config['validation_dataset']['noise_image_name'],
-'GT_image_name':config['validation_dataset']['GT_image_name'],         'GT_list_name':config['validation_dataset']['GT_list_name'], 
-'file_folder':config['validation_dataset']['file_folder'],                                   
-'batch_size':config['validation_dataset']['batch_size'],
-'setup_params':config['microscopy_params']['setup_params']}
     
 
     list_ID_est = np.int_(np.arange(1,config['est_dataset']['number_images']+1))
     est_set = MicroscopyDataLoader_est(list_ID_est, **est_file_names)
     est_generator = DataLoader(est_set, **params_est)
 
-    list_ID_validation = np.int_(np.arange(1,config['validation_dataset']['number_images']+1))
-    validation_set = MicroscopyDataLoader(list_ID_validation, **vallidation_file_names)
-    validation_generator = DataLoader(validation_set, **params_valid)
-    
 
     # build model architecture, then print to console
     model = getattr(module_arch, config["arch"]["type"])()
@@ -84,8 +74,14 @@ if __name__ == '__main__':
     args = argparse.ArgumentParser(description='training parameters')
     args.add_argument('-c', '--config', default="config_orientations_v2.json", type=str,
                       help='config file path (default: None)')
-    args.add_argument('-r', '--resume', default="/home/wut/Documents/Deep-SMOLM/data/save/models/intensity_weighted_moments_training_sym_90/0112_220013/model_best.pth", type=str,
+    args.add_argument('-r', '--resume', default="/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_corrected_angle_uniform_sampling_sym_90/0204_110752/model_best.pth", type=str,
                       help='path to latest checkpoint (default: None)')
+                      #/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_retrieve_pixOL_com_sym_90/0217_172852    #trained with pixOL com using 523/610+unform [-100,100] z distribition
+                      #/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_retrieve_pixOL_com_sym_90/0215_231941    #trained with beads using 523/610 filter
+                      #/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_close2unifrm_sample_M_v2_sym_90/0206_130818
+                      #/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_M_close2uniform_sampled_sym_90/0128_001127
+                      #/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_corrected_angle_uniform_sampling_sym_90/0128_235439
+                      #/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_corrected_angle_uniform_sampling_sym_90/0204_110752
     args.add_argument('-d', '--device', default=None, type=str,
                       help='indices of GPUs to enable (default: all)')
 

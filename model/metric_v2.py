@@ -1,3 +1,4 @@
+from cmath import nan
 import torch
 import torch.nn.functional as F
 from model.loss import matlab_style_gauss2D
@@ -169,6 +170,7 @@ def postprocessing(config, output,idx):
     upsampling = config['microscopy_params']['setup_params']['upsampling_ratio'] 
     pixel_size = pixel_size_org/upsampling
     Jaccard_thred_pixel = config['Jaccard_1SM_thred']
+    I_thresh = config['microscopy_params']['setup_params']['I_thresh']
     Jaccard_thred = Jaccard_thred_pixel*pixel_size  #
 
 
@@ -185,7 +187,7 @@ def postprocessing(config, output,idx):
     #pre_est = np.sum(output,axis=1)
     for ii in range(B):
         pre_est_cur = output[ii,:,:,:]
-        I_thresh = 100
+        #I_thresh = 50
         x_est_save,y_est_save, est_img_crop = postprocessing_loc_v2(pre_est_cur, I_thresh)
         N_SM = np.size(x_est_save)
         if N_SM==0:
@@ -546,16 +548,19 @@ def postprocessing_loc_v2(est_images, I_thresh):
     I_mask = I_img > I_thresh
     mask_label = label(I_mask)
     #print(np.sum(mask_label != 0))
-    
+    [H,W]=np.shape(I_img)
     N_SM = np.max(mask_label)
     if N_SM==0:
         x_est_save = []
         y_est_save = []
         est_img_crop = []
     else:
-        x_est_save = np.zeros((N_SM,1))
+        x_est_save = np.zeros((N_SM,1)) 
+        x_est_save[:]=np.NaN       
         y_est_save = np.zeros((N_SM,1))
+        y_est_save[:]=np.NaN   
         est_img_crop = np.zeros((N_SM,6,2*rad+1,2*rad+1))
+        est_img_crop[:]=np.NaN   
         
         
         #print(np.max(mask_label))
@@ -570,11 +575,22 @@ def postprocessing_loc_v2(est_images, I_thresh):
             # in each block, use the pixel with the maximum intensity estimation as the estimated x,y locations
             x_est, y_est = np.argwhere(indx_max == 1)[0,:]#.squeeze()
             #print(x_est, y_est)
+            if x_est>rad and x_est+rad<W and y_est>rad and y_est+rad<H:
 
-            x_est_save[ii] = y_est
-            y_est_save[ii] = x_est
+                x_est_save[ii] = y_est
+                y_est_save[ii] = x_est
 
-            est_img_crop[ii,:,:,:] = est_images[:,x_est-rad:x_est+rad+1,y_est-rad:y_est+rad+1]
+                est_img_crop[ii,:,:,:] = est_images[:,x_est-rad:x_est+rad+1,y_est-rad:y_est+rad+1]
+               
+            
+        est_img_crop = est_img_crop[~np.isnan(est_img_crop)]
+        est_img_crop = np.reshape(est_img_crop,(-1,6,2*rad+1,2*rad+1))
+        x_est_save = x_est_save[~np.isnan(x_est_save)]
+        x_est_save = np.reshape(x_est_save,(-1,1))
+        y_est_save = y_est_save[~np.isnan(y_est_save)]
+        y_est_save = np.reshape(y_est_save,(-1,1))
+
+           
     
     return x_est_save,y_est_save, est_img_crop
 

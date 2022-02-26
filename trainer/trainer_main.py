@@ -111,25 +111,26 @@ class Trainer:
                 result = self._warmup_epoch(epoch)
             else:
                 result, fig_1SM, fig_angles_1SM, fig_2SMs= train_epoch(self,epoch)
-            if epoch==1:
-                train_loss = result["loss"]
-                Jaccard_1SM = result["Jaccard_1SM"]
-                Jaccard_2SMs = result["Jaccard_2SMs"]
-                RMSE_I_1SM = result["RMSE_I_1SM"]
-                RMSE_I_2SMs = result["RMSE_I_2SMs"]
-                RMSE_loc_1SM = result["RMSE_loc_1SM"]
-                RMSE_loc_2SMs = result["RMSE_loc_2SMs"]
-                test_loss = result["test_loss"]
+            if self.do_validation_1SM:
+                if epoch==1:
+                    train_loss = result["loss"]
+                    Jaccard_1SM = result["Jaccard_1SM"]
+                    Jaccard_2SMs = result["Jaccard_2SMs"]
+                    RMSE_I_1SM = result["RMSE_I_1SM"]
+                    RMSE_I_2SMs = result["RMSE_I_2SMs"]
+                    RMSE_loc_1SM = result["RMSE_loc_1SM"]
+                    RMSE_loc_2SMs = result["RMSE_loc_2SMs"]
+                    test_loss = result["test_loss"]
 
-            else:
-                train_loss = np.append(train_loss,result["loss"])
-                Jaccard_1SM = np.append(Jaccard_1SM,result["Jaccard_1SM"])
-                Jaccard_2SMs = np.append(Jaccard_2SMs,result["Jaccard_2SMs"])
-                RMSE_I_1SM = np.append(RMSE_I_1SM,result["RMSE_I_1SM"])
-                RMSE_I_2SMs = np.append(RMSE_I_2SMs,result["RMSE_I_2SMs"])
-                RMSE_loc_1SM = np.append(RMSE_loc_1SM,result["RMSE_loc_1SM"])
-                RMSE_loc_2SMs = np.append(RMSE_loc_2SMs,result["RMSE_loc_2SMs"])
-                test_loss = np.append(test_loss,result["test_loss"])    
+                else:
+                    train_loss = np.append(train_loss,result["loss"])
+                    Jaccard_1SM = np.append(Jaccard_1SM,result["Jaccard_1SM"])
+                    Jaccard_2SMs = np.append(Jaccard_2SMs,result["Jaccard_2SMs"])
+                    RMSE_I_1SM = np.append(RMSE_I_1SM,result["RMSE_I_1SM"])
+                    RMSE_I_2SMs = np.append(RMSE_I_2SMs,result["RMSE_I_2SMs"])
+                    RMSE_loc_1SM = np.append(RMSE_loc_1SM,result["RMSE_loc_1SM"])
+                    RMSE_loc_2SMs = np.append(RMSE_loc_2SMs,result["RMSE_loc_2SMs"])
+                    test_loss = np.append(test_loss,result["test_loss"])    
             # save logged informations into log dict
             log = {'epoch': epoch}
             for key, value in result.items():
@@ -164,10 +165,11 @@ class Trainer:
                     self.logger.info("Validation performance didn\'t improve for {} epochs. "
                                      "Training stops.".format(self.early_stop))
                     break
-            if ifSaveData == True:
+            if ifSaveData == True:               
                 savedata2comet(self,epoch,fig_1SM, fig_angles_1SM, fig_2SMs, best)
-                sio.savemat("save_output.mat",{'train_loss':train_loss,'Jaccard_1SM':Jaccard_1SM,'Jaccard_2SMs':Jaccard_2SMs,'RMSE_I_1SM':RMSE_I_1SM,'RMSE_I_2SMs':RMSE_I_2SMs,
-        'RMSE_loc_1SM':RMSE_loc_1SM,'RMSE_loc_2SMs':RMSE_loc_2SMs,'test_loss':test_loss})
+                if self.do_validation_1SM:
+                    sio.savemat("save_output.mat",{'train_loss':train_loss,'Jaccard_1SM':Jaccard_1SM,'Jaccard_2SMs':Jaccard_2SMs,'RMSE_I_1SM':RMSE_I_1SM,'RMSE_I_2SMs':RMSE_I_2SMs,
+            'RMSE_loc_1SM':RMSE_loc_1SM,'RMSE_loc_2SMs':RMSE_loc_2SMs,'test_loss':test_loss})
             plt.close('all')
 
 

@@ -111,6 +111,8 @@ def est_withou_GT(self):
     self.val_result = [] # Clear cache
     total_val_loss = 0
     has_SM1=0
+    est_all=[]
+    
 
     with torch.no_grad():
         with tqdm(self.est_data_loader) as progress:

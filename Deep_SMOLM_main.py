@@ -19,6 +19,7 @@ from collections import OrderedDict
 import random
 import numpy as np
 #import pixiedust
+import time
 
 
 def main(config: ConfigParser):
@@ -29,32 +30,14 @@ def main(config: ConfigParser):
 
     params_test = {'batch_size':config['data_loader']['args']['batch_size'],'shuffle':False, 'num_workers':config['data_loader']['args']['num_workers']}
 
-    params_valid = {'batch_size':config['validation_dataset_2SMs']['batch_size'],'shuffle':False, 'num_workers':config['data_loader']['args']['num_workers']}
-
     # infor for training/testing set
     train_test_file_names = {'noise_image_name':config['training_dataset']['noise_image_name'],
 'GT_image_name':config['training_dataset']['GT_image_name'],         'GT_list_name':config['training_dataset']['GT_list_name'], 
 'file_folder':config['training_dataset']['file_folder'],                                   
 'batch_size':config['data_loader']['args']['batch_size'],
 'setup_params':config['microscopy_params']['setup_params']}
+       
     
-    vallidation_file_names_1SM = {'noise_image_name':config['validation_dataset_1SM']['noise_image_name'],
-'GT_image_name':config['validation_dataset_1SM']['GT_image_name'],         'GT_list_name':config['validation_dataset_1SM']['GT_list_name'], 
-'file_folder':config['validation_dataset_1SM']['file_folder'],                                   
-'batch_size':config['validation_dataset_1SM']['batch_size'],
-'setup_params':config['microscopy_params']['setup_params']}
-
-    vallidation_file_names_2SMs = {'noise_image_name':config['validation_dataset_2SMs']['noise_image_name'],
-'GT_image_name':config['validation_dataset_2SMs']['GT_image_name'],         'GT_list_name':config['validation_dataset_2SMs']['GT_list_name'], 
-'file_folder':config['validation_dataset_2SMs']['file_folder'],                                   
-'batch_size':config['validation_dataset_2SMs']['batch_size'],
-'setup_params':config['microscopy_params']['setup_params']}
-
-
-
-    
-    
-      
    
     number_images = config['training_dataset']['number_images']  
     percentage = config['trainer']['percent']                                                                   
@@ -72,17 +55,6 @@ def main(config: ConfigParser):
     test_generator = DataLoader(test_set, **params_test)
     batch_size = config['data_loader']['args']['batch_size']
     print(len(training_generator)*batch_size, len(test_generator)*batch_size)
-
-    # instantiate the data class and create a datalaoder for validation
-    list_ID_validation_1SM = np.int_(np.arange(1,config['validation_dataset_1SM']['number_images']+1))
-    validation_set_1SM = MicroscopyDataLoader(list_ID_validation_1SM, **vallidation_file_names_1SM)
-    validation_generator_1SM = DataLoader(validation_set_1SM, **params_valid)
-    
-
-    list_ID_validation_2SMs = np.int_(np.arange(1,config['validation_dataset_2SMs']['number_images']+1))
-    validation_set_2SMs = MicroscopyDataLoader(list_ID_validation_2SMs, **vallidation_file_names_2SMs)
-    validation_generator_2SMs = DataLoader(validation_set_2SMs, **params_valid)
-    
 
 
 
@@ -107,8 +79,8 @@ def main(config: ConfigParser):
     trainer = Trainer(model, train_loss, optimizer,
                       config=config,
                       data_loader=training_generator,
-                      valid_data_loader_1SM=validation_generator_1SM,
-                      valid_data_loader_2SMs=validation_generator_2SMs,
+                      valid_data_loader_1SM=None,
+                      valid_data_loader_2SMs=None,
                       test_data_loader=test_generator,
                       lr_scheduler=lr_scheduler,
                       metric_for_val_1SM = val_1SM_loss_metri,
@@ -125,10 +97,12 @@ if __name__ == '__main__':
     args = argparse.ArgumentParser(description='training parameters')
     args.add_argument('-c', '--config', default="config_orientations_v2.json", type=str,
                       help='config file path (default: None)')
-    args.add_argument('-r', '--resume', default="/home/wut/Documents/Deep-SMOLM/data/save/models/intensity_weighted_moments_training_sym_90/0112_220013/model_best.pth", type=str,
+    args.add_argument('-r', '--resume', default="/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_retrieve_pixOL_com_sym_90/0216_234122/model_best.pth", type=str,
                       help='path to latest checkpoint (default: None)')
     args.add_argument('-d', '--device', default=None, type=str,
                       help='indices of GPUs to enable (default: all)')
+
+                      #/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_retrieve_pixOL_com_sym_90/0210_011251
 
     CustomArgs = collections.namedtuple('CustomArgs', 'flags type target')
     options = [
@@ -141,7 +115,7 @@ if __name__ == '__main__':
         CustomArgs(['--name', '--exp_name'], type=str, target=('name',)),
         CustomArgs(['--seed', '--seed'], type=int, target=('seed',))
     ]
-    
+    #time.sleep(4000)
     config = ConfigParser.get_instance(args, options)
     use_cuda = torch.cuda.is_available()
     device = torch.device("cuda:0" if use_cuda else "cpu")

@@ -79,6 +79,28 @@ class Est:
         if self.do_estimation:
             est,GT_list_all = est_withou_GT(self)
             sio.savemat(str(self.checkpoint_dir / self.config["est_dataset"]["save_name"]),{'est':est, 'GT_list_all':GT_list_all}) 
+
+
+
+    def est_experiment(self,data_batch_cur,data_FoV_cur):
+        """
+        Full training logic
+        """
+        not_improved_count = 0
+        #ifSaveData = self.config["comet"]["savedata"]
+
+
+        if self.do_validation:
+            orien_est_all,orient_GT_all, M_est_all,bias_con_all,data,label,output,I_GT_all,I_est_all = valid_epoch(self, 1)
+
+            sio.savemat(str(self.checkpoint_dir / self.config["validation_dataset"]["save_name"]),{'orien_est_all':orien_est_all,
+            'orient_GT_all':orient_GT_all,'M_est_all':M_est_all,'bias_con_all':bias_con_all,'data':data,'label':label,'output':output,
+            'I_GT_all':I_GT_all,'I_est_all':I_est_all}) 
+
+        if self.do_estimation:
+            est,GT_list_all = est_withou_GT(self)
+            sio.savemat(str(self.checkpoint_dir)+ '/'+self.config["est_dataset_experiment"]["save_name"]+'_'+str(data_batch_cur)+'_'+str(data_FoV_cur)+'th_FoV.mat',{'est':est, 'GT_list_all':GT_list_all}) 
+
             
 
 

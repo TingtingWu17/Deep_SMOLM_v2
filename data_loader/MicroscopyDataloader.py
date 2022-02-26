@@ -112,7 +112,7 @@ class MicroscopyDataLoader():
         Output_channel = np.concatenate((intensity_grid,Intensity_mask,theta_grid,phi_grid,gamma_grid,intensity_gaussian,sXX,sYY,sZZ,sXY,sXZ,sYZ), axis = 0)
         Output_channel = Output_channel.astype('float32')   
             
-        return Input_channel, Output_channel,self.list_IDs[idx]
+        return Input_channel, Output_channel
         
     
 def normalize_im(im, dmean, dstd):
