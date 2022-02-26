@@ -139,8 +139,7 @@ I_sYZ = I_intensity_up;
 
 h_basis = I_basis;
 h_basis(round((size(I_basis,1)+1)/2)+[-(h_shape(1)-1)/2:(h_shape(1)-1)/2],round((size(I_basis,2)+1)/2)+[-(h_shape(1)-1)/2:(h_shape(1)-1)/2]) = h;
-compensate = upsampling_ratio/2+1; %register the coordinate for even images;
-I_basis(round((size(I_basis,1)+1)/2)-compensate,round((size(I_basis,2)+1)/2)-compensate) = 1;
+I_basis(round((size(I_basis,1)+1)/2),round((size(I_basis,2)+1)/2)) = 1;
 
 I = I_SMs;
 Ix = I_SMsx;

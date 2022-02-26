@@ -1,4 +1,4 @@
-function imgPara = forward_model_opt_3D(pmask, image_size,NFP,z_range_phy,pixel_size_xy,pixel_size_z)
+function imgPara = forward_model_opt_3D_retrieved(pmask, image_size,NFP,z_range_phy,pixel_size_xy,pixel_size_z,retrieved_mask)
 
 maskName = fullfile('phasemask', pmask);
 emitter_wavelength = 610; %nm
@@ -11,6 +11,7 @@ zerothOrder = [0,0];%zerothOrder_RL;
 %construct phasemaskpara
 phasemaskpara.zeroorder = zerothOrder;
 phasemaskpara.maskname = maskName;
+phasemaskpara.calibrated_mask = retrieved_mask;
 
 imgPara.pix_sizex = pixel_size_xy; %the griding unit for RoSEO3D, in unit of nm
 imgPara.pix_sizez = pixel_size_z;
@@ -19,7 +20,7 @@ imgPara.number_axial_pixels = length(imgPara.axial_grid_points);
 
 
 %
-n1 = Nanoscope_beads('imageSize', image_size*3+5,...
+n1 = Nanoscope_beads('imageSize', image_size*3+4,...
     'ADcount', 1,...
     'emissWavelength', emitter_wavelength, ...
     'refractiveIndx',refractiveIndx,...

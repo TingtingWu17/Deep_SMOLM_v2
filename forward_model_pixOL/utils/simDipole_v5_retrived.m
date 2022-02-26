@@ -1,6 +1,6 @@
 %simulation of a dipole at an interface--By Adam Backer, Jan 1 2013
 %Adapted from Axelrod, Journal of Microscopy article, 2012. (see journal club slides for more details)
-function [basisImagex,basisImagey,basisBFPx,basisBFPy] = simDipole_v5(z,z2,zh,pmask,N,wavelength,n1,n2,nh,NA,M,pix_size)
+function [basisImagex,basisImagey,basisBFPx,basisBFPy] = simDipole_v5_retrived(z,z2,zh,pmask,N,wavelength,n1,n2,nh,NA,M,pix_size,retrieve_pmask_name)
 %N = 597;
 % Ting modified based on Oumeng's simDipole_v4
 
@@ -149,11 +149,9 @@ Eyz = fliplr(Eyz);
 
 %for propagation from BFP E-field to image plane via tube-lens, paraxial
 %approximation is in force.
-% load('pmask_retrieve.mat');
-% pmaskx = exp(1i*pmaskx);
-% pmasky = exp(1i*pmasky);
-pmaskx = pmask;
-pmasky = pmask;
+load(retrieve_pmask_name);
+pmaskx = exp(1i*pmaskX);
+pmasky = exp(1i*pmaskY);
 imgExx = fftshift(fft2(Exx.*pmaskx));
 imgEyx = fftshift(fft2(Eyx.*pmasky));
 imgExy = fftshift(fft2(Exy.*pmaskx));

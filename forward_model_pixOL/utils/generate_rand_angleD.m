@@ -14,7 +14,7 @@ mux(indx)=[];
 muy(indx)=[];
 muz(indx)=[];
 
-thetaD = asin(muz)/pi*180;
+thetaD = acos(muz)/pi*180;
 phiD = atan2(muy,mux)/pi*180;
 
 omega = rand(n_SMs_large,1)*2*pi;

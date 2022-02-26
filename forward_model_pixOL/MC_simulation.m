@@ -33,7 +33,7 @@ clc;
 
 % give the save address for generated data
 % ********************************
-save_folder = '/home/wut/Documents/Deep-SMOLM/data/opt_PSF_data_1000vs2/MC_simulation_20220121_SNR1000vs2_omega0_random_loc/'; 
+save_folder = '/home/wut/Documents/Deep-SMOLM/data/opt_PSF_data_1000vs2/MC_simulation_20220121_SNR1000vs2_omega2_random_loc/'; 
 % ********************************
 image_size = 32;  % the pixel size of the simulation image (feel free to change it)
 upsampling_ratio  = 6;
@@ -61,8 +61,8 @@ v=linspace(0,0.5,50);
 u=linspace(0.50,0.995,30);
 phiD_simulate=2*pi*v/pi*180;
 thetaD_simulate=acos(2*u-1)/pi*180;
-omega_simulate = 0;
-gamma_simulate = 1;
+omega_simulate = 2;
+gamma_simulate = 0.5732;
 frame_per_state = 200;
 count = 0;
 %%
@@ -81,7 +81,7 @@ n_SMs = 1; % number of single molecules
 %[thetaD_SMs,phiD_SMs,gamma_SMs] = generate_rand_angleD(n_SMs);
 thetaD_SMs = thetaD_simulate(ii);
 phiD_SMs = phiD_simulate(jj);
-gamma_SMs = 1;
+gamma_SMs = gamma_simulate;
 %gamma_SMs(:)=1;
 %theta angle of SMs, note theta is in the range of (0,90) degree
 %phi angle of SMs, note phi is in the range of (0,360) degree
