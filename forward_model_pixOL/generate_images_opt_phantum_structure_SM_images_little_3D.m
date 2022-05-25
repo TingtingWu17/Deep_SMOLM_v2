@@ -206,6 +206,7 @@ GT_list(4,:)=I_grd;
 GT_list(5,:)=thetaD_grd;
 GT_list(6,:)=phiD_grd;
 GT_list(7,:)=gamma_grd;
+img_bkg = background;
 
 %image_with_poission_bkgdRmvd = image_with_poission-background;
 image_with_poission_bkgdRmvd_up = image_with_poission_up-bkg_img_up;
@@ -213,7 +214,7 @@ image_with_poission_bkgdRmvd_up = image_with_poission_up-bkg_img_up;
 
 save([save_folder,'image_with_poission',num2str(ii),'.mat'],'image_with_poission');
 %save([save_folder,'image_with_poission_up',num2str(ii),'.mat'],'image_with_poission_up');
-%save([save_folder,'image_with_poission_bkgdRmvd',num2str(ii),'.mat'],'image_with_poission_bkgdRmvd');
+save([save_folder,'img_bkg',num2str(ii),'.mat'],'img_bkg');
 save([save_folder,'image_with_poission_bkgdRmvd_up',num2str(ii),'.mat'],'image_with_poission_bkgdRmvd_up');
 save([save_folder,'image_GT_up',num2str(ii),'.mat'],'image_GT_up');
 save([save_folder,'GT_list',num2str(ii),'.mat'],'GT_list');

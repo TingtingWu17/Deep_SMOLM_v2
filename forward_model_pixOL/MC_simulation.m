@@ -33,7 +33,7 @@ clc;
 
 % give the save address for generated data
 % ********************************
-save_folder = '/home/wut/Documents/Deep-SMOLM/data/opt_PSF_data_1000vs2/MC_simulation_20220121_SNR1000vs2_omega2_random_loc/'; 
+save_folder = '/home/wut/Documents/Deep-SMOLM/data/opt_PSF_data_1000vs2/MC_simulation_20220518_SNR1000vs2_omega0_random_loc/'; 
 % ********************************
 image_size = 32;  % the pixel size of the simulation image (feel free to change it)
 upsampling_ratio  = 6;
@@ -61,8 +61,8 @@ v=linspace(0,0.5,50);
 u=linspace(0.50,0.995,30);
 phiD_simulate=2*pi*v/pi*180;
 thetaD_simulate=acos(2*u-1)/pi*180;
-omega_simulate = 2;
-gamma_simulate = 0.5732;
+omega_simulate = 0;
+gamma_simulate = 1;%0.5732;
 frame_per_state = 200;
 count = 0;
 %%
@@ -189,15 +189,30 @@ GT_list(3,:)=I_grd;
 GT_list(4,:)=thetaD_grd;
 GT_list(5,:)=phiD_grd;
 GT_list(6,:)=gamma_grd;
+image_noiseless(1,:,:) = Ix;
+image_noiseless(2,:,:) = Iy;
 
 image_with_poission_bkgdRmvd = image_with_poission-background;
 image_with_poission_bkgdRmvd_up = image_with_poission_up-background;
 
+image_GT_up(1,:,:) = I_intensity_up;
+image_GT_up(2,:,:) = I_theta_up;
+image_GT_up(3,:,:) = I_phi_up;
+image_GT_up(4,:,:) = I_gamma_up;
+image_GT_up(5,:,:) = I_intensity_gaussian;
+image_GT_up(6,:,:) = I_sXX;
+image_GT_up(7,:,:) = I_sYY;
+image_GT_up(8,:,:) = I_sZZ;
+image_GT_up(9,:,:) = I_sXY;
+image_GT_up(10,:,:) = I_sXZ;
+image_GT_up(11,:,:) = I_sYZ;
+
 
 save([save_folder,'image_with_poission',num2str(count),'.mat'],'image_with_poission');
-save([save_folder,'image_with_poission_bkgdRmvd_up',num2str(count),'.mat'],'image_with_poission_bkgdRmvd_up');
-
+%save([save_folder,'image_with_poission_bkgdRmvd_up',num2str(count),'.mat'],'image_with_poission_bkgdRmvd_up');
+save([save_folder,'image_noiseless',num2str(count),'.mat'],'image_noiseless');
 save([save_folder,'GT_list',num2str(count),'.mat'],'GT_list');
+save([save_folder,'image_GT_up',num2str(count),'.mat'],'image_GT_up');
 
 end
 

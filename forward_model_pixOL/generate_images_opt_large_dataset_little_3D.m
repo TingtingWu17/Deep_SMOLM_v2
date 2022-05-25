@@ -59,7 +59,7 @@ SM_num_range = 8;
 SM_num_min = 7;
 
 
-for ii = 60000:80000  %each 4 images, and total 2000*4 images
+for ii = 1:90000  %each 4 images, and total 2000*4 images
 if rem(ii,100)==0
    ii
 end
@@ -206,6 +206,7 @@ GT_list(4,:)=I_grd;
 GT_list(5,:)=thetaD_grd;
 GT_list(6,:)=phiD_grd;
 GT_list(7,:)=gamma_grd;
+img_bkg = background;
 
 image_with_poission_bkgdRmvd = image_with_poission-background;
 image_with_poission_bkgdRmvd_up = image_with_poission_up-background;
@@ -214,6 +215,7 @@ image_with_poission_bkgdRmvd_up = image_with_poission_up-background;
 save([save_folder,'image_with_poission',num2str(ii),'.mat'],'image_with_poission');
 %save([save_folder,'image_with_poission_up',num2str(ii),'.mat'],'image_with_poission_up');
 %save([save_folder,'image_with_poission_bkgdRmvd',num2str(ii),'.mat'],'image_with_poission_bkgdRmvd');
+save([save_folder,'img_bkg',num2str(ii),'.mat'],'img_bkg');
 save([save_folder,'image_with_poission_bkgdRmvd_up',num2str(ii),'.mat'],'image_with_poission_bkgdRmvd_up');
 save([save_folder,'image_GT_up',num2str(ii),'.mat'],'image_GT_up');
 save([save_folder,'GT_list',num2str(ii),'.mat'],'GT_list');

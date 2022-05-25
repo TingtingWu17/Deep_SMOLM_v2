@@ -17,14 +17,14 @@ clc;
 % give the save address for generated data
 % ********************************
 
-save_folder = '/home/wut/Documents/Deep-SMOLM/data/opt_PSF_data_1000vs2/training_20220215_retrieve_pixOL_com_SNR1000vs4_large_variance_corrected_angle_uniform_distribution/'; 
+save_folder = '/home/wut/Documents/Deep-SMOLM/data/opt_PSF_data_1000vs2/training_20220513_pixOL_SNR1000vs2_gamma_linear_2nd_wo_signal_weighting/'; 
 % ********************************
 image_size = 60;  % the pixel size of the simulation image (feel free to change it)
 upsampling_ratio  = 6;
 pmask = 'pixOL_v12.bmp';
-pmask_retrieve_name = '20220214_pixOL_com_retrieve.mat';
-basis_matrix_opt = forward_model_opt_retrieved(pmask, image_size,pmask_retrieve_name);
-%basis_matrix_opt = forward_model_opt(pmask, image_size);
+%pmask_retrieve_name = '20220214_pixOL_com_retrieve.mat';
+%basis_matrix_opt = forward_model_opt_retrieved(pmask, image_size,pmask_retrieve_name);
+basis_matrix_opt = forward_model_opt(pmask, image_size);
 pixel_size = 58.6; %in unit of um
 
 %% gaussian filter
@@ -39,7 +39,7 @@ h = h./max(max(h));
 
 n_images = 1; % the simulated image numbers (feel free to change it)
 signal= 1000; %(feel free to change it)
-background_avg=4; %(feel free to change it)
+background_avg=2; %(feel free to change it)
 %signal_sigma = 2000;
 SM_num_range = 8;
 SM_num_min = 7;
@@ -63,7 +63,9 @@ image_with_poission_up = zeros(2,image_size*upsampling_ratio,image_size*upsampli
 image_GT_up = zeros(5,image_size*upsampling_ratio,image_size*upsampling_ratio);
 
 n_SMs = floor(rand(1)*SM_num_range+SM_num_min); % number of single molecules
-[thetaD_SMs,phiD_SMs,gamma_SMs] = generate_rand_angleD(n_SMs);
+[thetaD_SMs,phiD_SMs,gamma_SMs] = generate_rand_angleD_gamma_linear_distribution(n_SMs);
+%[thetaD_SMs,phiD_SMs,gamma_SMs] = generate_rand_angleD(n_SMs);
+
 %[thetaD_SMs,phiD_SMs,gamma_SMs] = generate_rand_angleD_with_M_uniformly_sampled_v2(n_SMs);
 
 %theta angle of SMs, note theta is in the range of (0,90) degree
@@ -73,8 +75,8 @@ n_SMs = floor(rand(1)*SM_num_range+SM_num_min); % number of single molecules
 
 x_SMs = (0.10+0.8*rand(1,n_SMs))*image_size-(image_size)/2; %x location, in unit of pixles
 y_SMs = (0.10+0.8*rand(1,n_SMs))*image_size-(image_size)/2; %y location, in unit of pixles
-%temp = (poissrnd(3,1,100000)+normrnd(0,1,1,100000)-0.5)*350; temp(temp<100)=[]; hist(temp,1000); mean(temp)
-temp = (poissrnd(3,1,100)+normrnd(0,1,1,100)-0.5)*350; temp(temp<80)=[];
+temp = (poissrnd(3,1,100000)+normrnd(0,1,1,100000)-0.5)*350; temp(temp<100)=[];  %mean(temp)
+%temp = (poissrnd(6,1,100)+normrnd(0,1,1,100)-0.5)*350; temp(temp<80)=[];
 signal_SMs = temp(1:n_SMs);
 x_SMs_phy = x_SMs*pixel_size;
 y_SMs_phy = y_SMs*pixel_size;
@@ -84,8 +86,8 @@ x_grd(1:n_SMs) = x_SMs.'; y_grd(1:n_SMs) = y_SMs.';  x_phy(1:n_SMs) = x_SMs_phy.
 thetaD_grd(1:n_SMs) = thetaD_SMs.'; phiD_grd(1:n_SMs)=phiD_SMs.'; 
 gamma_grd(1:n_SMs) = gamma_SMs.'; I_grd(1:n_SMs) = signal_SMs.'; 
 
-background = rand(1)*2-1+background_avg;
-
+%background = rand(1)*2-1+background_avg;
+background = background_avg;
 
 %% forward imaging system
 
@@ -139,12 +141,19 @@ I_gamma_up = I_gamma_up+temp1*gamma_SMs(i);
 
 temp = imtranslate(h_basis,[(x_SMs(i)*upsampling_ratio),(y_SMs(i)*upsampling_ratio)],'bicubic');
 I_intensity_gaussian = I_intensity_gaussian+temp*signal_SMs(i);
-I_sXX = I_sXX+temp*signal_SMs(i)*muxx(i);
-I_sYY = I_sYY+temp*signal_SMs(i)*muyy(i);
-I_sZZ = I_sZZ+temp*signal_SMs(i)*muzz(i);
-I_sXY = I_sXY+temp*signal_SMs(i)*muxy(i);
-I_sXZ = I_sXZ+temp*signal_SMs(i)*muxz(i);
-I_sYZ = I_sYZ+temp*signal_SMs(i)*muyz(i);
+% I_sXX = I_sXX+temp*signal_SMs(i)*muxx(i);
+% I_sYY = I_sYY+temp*signal_SMs(i)*muyy(i);
+% I_sZZ = I_sZZ+temp*signal_SMs(i)*muzz(i);
+% I_sXY = I_sXY+temp*signal_SMs(i)*muxy(i);
+% I_sXZ = I_sXZ+temp*signal_SMs(i)*muxz(i);
+% I_sYZ = I_sYZ+temp*signal_SMs(i)*muyz(i);
+
+I_sXX = I_sXX+temp*muxx(i);
+I_sYY = I_sYY+temp*muyy(i);
+I_sZZ = I_sZZ+temp*muzz(i);
+I_sXY = I_sXY+temp*muxy(i);
+I_sXZ = I_sXZ+temp*muxz(i);
+I_sYZ = I_sYZ+temp*muyz(i);
 end
 
 I_poissx = poissrnd(Ix); % if you need multiple realization for a single ground truth, modify here
@@ -182,15 +191,16 @@ GT_list(4,:)=I_grd;
 GT_list(5,:)=thetaD_grd;
 GT_list(6,:)=phiD_grd;
 GT_list(7,:)=gamma_grd;
-
+img_bkg = background;
 image_with_poission_bkgdRmvd = image_with_poission-background;
 image_with_poission_bkgdRmvd_up = image_with_poission_up-background;
 
 
 save([save_folder,'image_with_poission',num2str(ii),'.mat'],'image_with_poission');
+save([save_folder,'img_bkg',num2str(ii),'.mat'],'img_bkg');
 %save([save_folder,'image_with_poission_up',num2str(ii),'.mat'],'image_with_poission_up');
 %save([save_folder,'image_with_poission_bkgdRmvd',num2str(ii),'.mat'],'image_with_poission_bkgdRmvd');
-save([save_folder,'image_with_poission_bkgdRmvd_up',num2str(ii),'.mat'],'image_with_poission_bkgdRmvd_up');
+%save([save_folder,'image_with_poission_bkgdRmvd_up',num2str(ii),'.mat'],'image_with_poission_bkgdRmvd_up');
 save([save_folder,'image_GT_up',num2str(ii),'.mat'],'image_GT_up');
 save([save_folder,'GT_list',num2str(ii),'.mat'],'GT_list');
 save([save_folder,'image_noiseless',num2str(ii),'.mat'],'image_noiseless');
