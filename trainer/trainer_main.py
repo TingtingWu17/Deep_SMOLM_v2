@@ -110,7 +110,7 @@ class Trainer:
             if epoch <= self.config['trainer']['warmup']:
                 result = self._warmup_epoch(epoch)
             else:
-                result, fig_1SM, fig_angles_1SM, fig_2SMs= train_epoch(self,epoch)
+                result= train_epoch(self,epoch)
             if self.do_validation_1SM:
                 if epoch==1:
                     train_loss = result["loss"]
@@ -166,7 +166,7 @@ class Trainer:
                                      "Training stops.".format(self.early_stop))
                     break
             if ifSaveData == True:               
-                savedata2comet(self,epoch,fig_1SM, fig_angles_1SM, fig_2SMs, best)
+                savedata2comet(self,epoch,best=best)
                 if self.do_validation_1SM:
                     sio.savemat("save_output.mat",{'train_loss':train_loss,'Jaccard_1SM':Jaccard_1SM,'Jaccard_2SMs':Jaccard_2SMs,'RMSE_I_1SM':RMSE_I_1SM,'RMSE_I_2SMs':RMSE_I_2SMs,
             'RMSE_loc_1SM':RMSE_loc_1SM,'RMSE_loc_2SMs':RMSE_loc_2SMs,'test_loss':test_loss})

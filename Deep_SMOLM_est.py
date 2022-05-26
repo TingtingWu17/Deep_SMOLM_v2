@@ -8,11 +8,14 @@ import torch
 #import mlflow
 #import mlflow.pytorch
 from data_loader.MicroscopyDataloader_est import MicroscopyDataLoader_est
-from data_loader.MicroscopyDataloader import MicroscopyDataLoader
+#from data_loader.MicroscopyDataloader import MicroscopyDataLoader
+#from data_loader.MicroscopyDataloader_singleSM import MicroscopyDataLoader_singleSM as MicroscopyDataLoader
 from torch.utils.data import DataLoader
 import model.loss as module_loss
 import model.metric_v2 as module_metric
-import model.model as module_arch
+#import model.model as module_arch
+import model.model_v2 as module_arch
+#import model.resnet as module_arch
 from parse_config import ConfigParser
 from trainer.trainer_main import *
 from trainer.est_main import *
@@ -74,8 +77,19 @@ if __name__ == '__main__':
     args = argparse.ArgumentParser(description='training parameters')
     args.add_argument('-c', '--config', default="config_orientations_v2.json", type=str,
                       help='config file path (default: None)')
-    args.add_argument('-r', '--resume', default="/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_corrected_angle_uniform_sampling_sym_90/0204_110752/model_best.pth", type=str,
+    args.add_argument('-r', '--resume', default="/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_corrected_angle_uniform_sampling_sym_89/0525_144540/model_best.pth", type=str,
                       help='path to latest checkpoint (default: None)')
+                      #0513_121207 trained with l1-loss
+                      #0512_140704 resnet 2nd moment
+                      #0511_110720 noiseless without signal weighting w intensity MSE
+                      #0510_171145 noiseless without signal weighting
+                      #0506_155907 noiseless with signal weighting
+                      #0422_212013 #multilayerd gammalinear distribution+enhanced SNR 
+                      #0407_124133 #multilayerd gammalinear distribution
+                      #0406_235733 #multihead deep scaled cross term
+                    #"/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_corrected_angle_uniform_sampling_sym_90/0406_155446/model_best.pth"
+                      #/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_corrected_angle_uniform_sampling_sym_90/0406_102045/model_best.pth   # trained with pixOL perfect data using Deep-STORM3D+multihead
+                      #/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_corrected_angle_uniform_sampling_sym_90/0405_204415    # trained with pixOL perfect data using Deep-STORM3D
                       #/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_retrieve_pixOL_com_sym_90/0217_172852    #trained with pixOL com using 523/610+unform [-100,100] z distribition
                       #/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_retrieve_pixOL_com_sym_90/0215_231941    #trained with beads using 523/610 filter
                       #/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_close2unifrm_sample_M_v2_sym_90/0206_130818

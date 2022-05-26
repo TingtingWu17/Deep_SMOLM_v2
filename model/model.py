@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from abc import abstractmethod
+import matplotlib.pyplot as plt
 #from base import BaseModel
 
 
@@ -253,7 +254,7 @@ class UNet(nn.Module):
         # for chn in range(4):
         #     self.all_upconvs[chn] = nn.ModuleList(self.all_upconvs[chn])
 
-        self.reset_params()
+        #self.reset_params()
 
     @staticmethod
     def weight_init(m):

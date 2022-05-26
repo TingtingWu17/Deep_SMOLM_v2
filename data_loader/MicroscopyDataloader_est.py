@@ -68,6 +68,7 @@ class MicroscopyDataLoader_est():
         self.batch_size = batch_size
         self.setup_params = setup_params
         self.GT_list_name = GT_list_name
+        self.GT_image_name = "image_GT_up"
         
         
         
@@ -85,7 +86,8 @@ class MicroscopyDataLoader_est():
         XY_channel =np.array(noise_image[self.noise_image_name]) # 6 480 480 1
         #XY_channel = np.expand_dims(XY_channel,axis=-1)
         XY_channel = XY_channel.transpose(0,1,2)
-        
+        #XY_channel = np.repeat(XY_channel,6,axis=1)
+        #XY_channel = np.repeat(XY_channel,6,axis=2)
         #XY_channel = normalize_im(XY_channel, dmean, dstd)
                             
         Input_channel = XY_channel.astype('float32') 
@@ -95,6 +97,22 @@ class MicroscopyDataLoader_est():
             GT_list_final = np.reshape(GT_list,(1,-1))
         else:
             GT_list_final = 0
+
+        # GT_image = sio.loadmat(self.file_folder+"/"+self.GT_image_name+ID+'.mat') 
+        # GT_channel =np.array(GT_image[self.GT_image_name]) # 6 480 480 1
+        # #GT_channel = np.expand_dims(GT_channel,axis=-1)
+        # GT_channel = GT_channel.transpose(0,1,2)
+        # intensity_grid,theta_grid,phi_grid,gamma_grid = GT_channel[0:1,:,:],GT_channel[1:2,:,:],GT_channel[2:3,:,:],GT_channel[3:4,:,:]
+        # intensity_gaussian = GT_channel[4:5,:,:]
+        # sXX,sYY,sZZ,sXY,sXZ,sYZ = GT_channel[5:6,:,:],GT_channel[6:7,:,:],GT_channel[7:8,:,:],GT_channel[8:9,:,:],GT_channel[9:10,:,:],GT_channel[10:11,:,:]
+        # #modified_gamma, sXX_wo_gamma, sYY_wo_gamma, sZZ_wo_gamma = GT_channel[11:12,:,:],GT_channel[12:13,:,:],GT_channel[13:14,:,:],GT_channel[14:15,:,:]
+
+
+        # Intensity_mask = np.array(intensity_grid,copy=True)
+        # Intensity_mask[Intensity_mask>1]=1  
+            
+        # Output_channel = np.concatenate((intensity_grid,Intensity_mask,theta_grid,phi_grid,gamma_grid,intensity_gaussian,sXX,sYY,sZZ,sXY,sXZ,sYZ), axis = 0)
+        # Output_channel = Output_channel.astype('float32')   
                
             
         return Input_channel, self.list_IDs[idx], GT_list_final

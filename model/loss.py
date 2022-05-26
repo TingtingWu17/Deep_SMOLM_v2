@@ -260,13 +260,24 @@ def orientaitons_loss(spikes_pred, heatmap_true, scaling_factor):
     # muxy_true_blur = F.conv2d(intensity_true*muxy_true, gfilter2, stride=1, padding=3)
     # muxz_true_blur = F.conv2d(intensity_true*muxz_true, gfilter2, stride=1, padding=3)
     # muyz_true_blur = F.conv2d(intensity_true*muyz_true, gfilter2, stride=1, padding=3)
-    muxx_true_blur = heatmap_true[:,6,:,:].unsqueeze(1)  
-    muyy_true_blur = heatmap_true[:,7,:,:].unsqueeze(1) 
-    muzz_true_blur = heatmap_true[:,8,:,:].unsqueeze(1) 
-    muxy_true_blur = heatmap_true[:,9,:,:].unsqueeze(1) 
-    muxz_true_blur = heatmap_true[:,10,:,:].unsqueeze(1) 
-    muyz_true_blur = heatmap_true[:,11,:,:].unsqueeze(1) 
-
+    intensity_true_blur = 0.5*heatmap_true[:,5,:,:].unsqueeze(1) 
+    muxx_true_blur = 1000*heatmap_true[:,6,:,:].unsqueeze(1)  
+    muyy_true_blur = 1000*heatmap_true[:,7,:,:].unsqueeze(1) 
+    muzz_true_blur = 1000*heatmap_true[:,8,:,:].unsqueeze(1) 
+    muxy_true_blur = 1000*heatmap_true[:,9,:,:].unsqueeze(1) 
+    muxz_true_blur = 1000*heatmap_true[:,10,:,:].unsqueeze(1) 
+    muyz_true_blur = 1000*heatmap_true[:,11,:,:].unsqueeze(1) 
+    # muxx_true_blur = heatmap_true[:,6,:,:].unsqueeze(1)  
+    # muyy_true_blur = heatmap_true[:,7,:,:].unsqueeze(1) 
+    # muzz_true_blur = heatmap_true[:,8,:,:].unsqueeze(1) 
+    # muxy_true_blur = heatmap_true[:,9,:,:].unsqueeze(1) 
+    # muxz_true_blur = heatmap_true[:,10,:,:].unsqueeze(1) 
+    # muyz_true_blur = heatmap_true[:,11,:,:].unsqueeze(1) 
+    #gamma_true_blur = 1000*heatmap_true[:,4,:,:].unsqueeze(1)   #gamma heatmap
+    #modified_gamma_true_blur = 1000*heatmap_true[:,12,:,:].unsqueeze(1)   # modified gamma = (1-gamma)/3
+    #muxx_wo_gamma_true_blur = 1000*heatmap_true[:,13,:,:].unsqueeze(1)
+    #muyy_wo_gamma_true_blur = 1000*heatmap_true[:,14,:,:].unsqueeze(1)
+    #muzz_wo_gamma_true_blur = 1000*heatmap_true[:,15,:,:].unsqueeze(1)
 
     muxx_est = spikes_pred[:,0,:,:].unsqueeze(1) 
     muyy_est = spikes_pred[:,1,:,:].unsqueeze(1) 
@@ -274,15 +285,35 @@ def orientaitons_loss(spikes_pred, heatmap_true, scaling_factor):
     muxy_est = spikes_pred[:,3,:,:].unsqueeze(1) 
     muxz_est = spikes_pred[:,4,:,:].unsqueeze(1) 
     muyz_est = spikes_pred[:,5,:,:].unsqueeze(1) 
+    I_est = spikes_pred[:,6,:,:].unsqueeze(1) 
+    #modified_gamma_est = gamma_true_blur   #spikes_pred[:,6,:,:].unsqueeze(1) 
+
+    # muxx_wo_gamma_est = (muxx_est-modified_gamma_est)
+    # muyy_wo_gamma_est = (muyy_est-modified_gamma_est)
+    # muzz_wo_gamma_est = (muzz_est-modified_gamma_est)
      
     
-    mse_M = F.mse_loss(muxx_true_blur, muxx_est)+F.mse_loss(muyy_true_blur, muyy_est)+F.mse_loss(muzz_true_blur, muzz_est)+F.mse_loss(muxy_true_blur, muxy_est)+F.mse_loss(muxz_true_blur, muxz_est)+F.mse_loss(muyz_true_blur, muyz_est)
+    #mse_M = F.mse_loss(muxx_true_blur, muxx_est)+F.mse_loss(muyy_true_blur, muyy_est)+F.mse_loss(muzz_true_blur, muzz_est)+F.mse_loss(muxy_true_blur, muxy_est)+F.mse_loss(muxz_true_blur, muxz_est)+F.mse_loss(muyz_true_blur, muyz_est)
+    mse_M2 = F.mse_loss(muxx_true_blur, muxx_est)+F.mse_loss(muyy_true_blur, muyy_est)+F.mse_loss(muzz_true_blur, muzz_est)+F.mse_loss(muxy_true_blur, muxy_est)+F.mse_loss(muxz_true_blur, muxz_est)+F.mse_loss(muyz_true_blur, muyz_est)+F.mse_loss(intensity_true_blur, I_est)
+    mse_M = F.l1_loss(muxx_true_blur, muxx_est)+F.l1_loss(muyy_true_blur, muyy_est)+F.l1_loss(muzz_true_blur, muzz_est)+F.l1_loss(muxy_true_blur, muxy_est)+F.l1_loss(muxz_true_blur, muxz_est)+F.l1_loss(muyz_true_blur, muyz_est)+F.l1_loss(intensity_true_blur, I_est)
+    
+    #based on difference with gamma
+    # angle_diff = (muxx_wo_gamma_true_blur*muxx_wo_gamma_est+muyy_wo_gamma_true_blur*muyy_wo_gamma_est+muzz_wo_gamma_true_blur*muzz_wo_gamma_est+2*muxy_true_blur*muxy_est+2*muxz_true_blur*muxz_est+2*muyz_true_blur*muyz_est)
+    # angle_diff1 = modified_gamma_true_blur*modified_gamma_est
+    # loss_angle = torch.mean(torch.abs(angle_diff-gamma_true_blur*gamma_true_blur))
+    # loss_angle1 = torch.mean(torch.abs(angle_diff1-modified_gamma_true_blur*modified_gamma_true_blur))
+    # compare = (angle_diff-angle_diff+1)*2000
+    # temp1 = torch.minimum(torch.sqrt(torch.abs(angle_diff)),compare)
+    # loss_angle_distance = torch.sum(torch.abs(torch.acos(temp1/2000)-torch.acos(gamma_true_blur/2000)))
+    
+    #L1_loss = F.l1_loss(1000*muxx_true_blur, muxx_est)+F.l1_loss(1000*muyy_true_blur, muyy_est)+F.l1_loss(1000*muzz_true_blur, muzz_est)+F.l1_loss(1000*muxy_true_blur, muxy_est)+F.l1_loss(1000*muxz_true_blur, muxz_est)+F.l1_loss(1000*muyz_true_blur, muyz_est)
+
 
     #mse_M = 1.2472*F.mse_loss(muxx_true_blur, muxx_est)+1.2530*F.mse_loss(muyy_true_blur, muyy_est)+2.51*F.mse_loss(muzz_true_blur, muzz_est)+11.5102*F.mse_loss(muxy_true_blur, muxy_est)+1.3120*F.mse_loss(muxz_true_blur, muxz_est)+1.3149*F.mse_loss(muyz_true_blur, muyz_est)
 
-    l1_M = F.l1_loss(torch.sqrt(muxx_true_blur**2+muyy_true_blur**2+muzz_true_blur**2+muxy_true_blur**2+muxz_true_blur**2+muyz_true_blur**2),torch.zeros(muyz_true_blur.shape).to(device))
+    #l1_M = F.l1_loss(torch.sqrt(muxx_true_blur**2+muyy_true_blur**2+muzz_true_blur**2+muxy_true_blur**2+muxz_true_blur**2+muyz_true_blur**2),torch.zeros(muyz_true_blur.shape).to(device))
 
-    loss = mse_M 
+    
 
     lossI = F.mse_loss((muxx_true_blur+muyy_true_blur+muzz_true_blur)/3, (muxx_est+muyy_est+muzz_est)/3)
     lossXX = F.mse_loss(muxx_true_blur, muxx_est)
@@ -292,4 +323,21 @@ def orientaitons_loss(spikes_pred, heatmap_true, scaling_factor):
     lossXZ = F.mse_loss(muxz_true_blur, muxz_est)
     lossYZ = F.mse_loss(muyz_true_blur, muyz_est)
 
-    return loss, [mse_M.data.cpu().item(), lossI.data.cpu().item(), lossXX.data.cpu().item(), lossYY.data.cpu().item(), lossZZ.data.cpu().item(), lossXY.data.cpu().item(), lossXZ.data.cpu().item(), lossYZ.data.cpu().item()]
+    loss = mse_M
+
+    return loss, [lossI.data.cpu().item(), mse_M2.data.cpu().item(), lossXX.data.cpu().item(), lossYY.data.cpu().item(), lossZZ.data.cpu().item(), lossXY.data.cpu().item(), lossXZ.data.cpu().item(), lossYZ.data.cpu().item()]
+
+
+def momentum_z_loss_2nd_network(mom_pred, mom_gt, scaling_factor): # Second edition adding CRB, original version is at top
+    #mom_pred = mom_pred[1]    
+    mse_xx_loss = F.mse_loss(mom_pred[:,0], mom_gt[:,4])
+    mse_yy_loss = F.mse_loss(mom_pred[:,1], mom_gt[:,5])
+    mse_zz_loss = F.mse_loss(mom_pred[:,2], mom_gt[:,6])
+    mse_xy_loss = F.mse_loss(mom_pred[:,3], mom_gt[:,7])
+    mse_xz_loss = F.mse_loss(mom_pred[:,4], mom_gt[:,8])
+    mse_yz_loss = F.mse_loss(mom_pred[:,5], mom_gt[:,9])
+    I_loss = F.mse_loss(mom_pred[:,0]+mom_pred[:,1]+mom_pred[:,2], mom_gt[:,4]*mom_gt[:,0]+mom_gt[:,5]*mom_gt[:,0]+mom_gt[:,6]*mom_gt[:,0])
+
+    loss = (mse_xx_loss+mse_yy_loss+mse_zz_loss+mse_xy_loss+mse_xz_loss+mse_yz_loss)
+    loss_track = [loss.data.cpu().item(), I_loss.data.cpu().item(), mse_xx_loss.data.cpu().item(), mse_yy_loss.data.cpu().item(), mse_zz_loss.data.cpu().item(), mse_xy_loss.data.cpu().item(), mse_xz_loss.data.cpu().item(), mse_yz_loss.data.cpu().item()]
+    return loss, loss_track

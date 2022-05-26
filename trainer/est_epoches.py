@@ -12,7 +12,7 @@ from numpy import inf
 from trainer.trainer_utils import *
 from logger import CometWriter
 import scipy.io as sio
-from model.metric_v2 import postprocessing
+from model.metric_v2 import postprocessing, RMSE_1SM_resnet
 
 
 
@@ -121,10 +121,13 @@ def est_withou_GT(self):
                 progress.set_description_str(f'Valid epoch ')
                 data = data.to(self.device)
                 output = self.model(data)
+                #output = Output_channel[:,6:12,:,:]
                 B,L,H,W = np.shape(data)
                 #self.val_result.append(output) # added
                 
                 est = postprocessing(self.config, output,idx)# Changed for only localization
+                #est = postprocessing2(self.config, output,idx)
+                #est = RMSE_1SM_resnet(self.config, output,idx)
                 if batch_idx == 0:
                     GT_list_all = GT_list
                 else:

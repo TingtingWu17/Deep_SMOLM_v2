@@ -1,0 +1,38 @@
+%% plot reconstruction video
+Image = Tiff('C:\Users\wu.t\OneDrive - Washington University in St. Louis\github\data of PSF-optimization\figure_generation_data\Fig3\reconstructed_filted\reconstruction-1.tif','r');
+for ii = 1:100
+setDirectory(Image,ii)
+image_cur(:,:,:,ii) = Image.read;
+end
+
+%
+v = VideoWriter('reconstruction.mp4');
+v.Quality = 95;
+v.FrameRate = 2;
+
+open(v);
+%v.VideoCompressionMethod = 'H.264';
+for ii = 1:100
+    A = image_cur(:,:,:,ii);
+    writeVideo(v,A);
+end
+close(v);
+
+
+
+%% plot reconstruction video
+fileFolder = 'C:\Users\wu.t\OneDrive - Washington University in St. Louis\github\data of PSF-optimization\figure_generation_data\Fig3\spikes-plane';
+
+
+%
+v = VideoWriter('reconstruction.mp4');
+v.Quality = 95;
+v.FrameRate = 2;
+
+open(v);
+%v.VideoCompressionMethod = 'H.264';
+for ii = 1:50
+    A = imread()
+    writeVideo(v,A);
+end
+close(v);

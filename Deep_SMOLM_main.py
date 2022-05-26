@@ -8,10 +8,13 @@ import torch
 #import mlflow
 #import mlflow.pytorch
 from data_loader.MicroscopyDataloader import MicroscopyDataLoader
+#from data_loader.MicroscopyDataloader_singleSM import MicroscopyDataLoader_singleSM as MicroscopyDataLoader
 from torch.utils.data import DataLoader
 import model.loss as module_loss
 import model.metric_v2 as module_metric
-import model.model as module_arch
+#import model.model as module_arch
+import model.model_v2 as module_arch
+#import model.resnet as module_arch
 from parse_config import ConfigParser
 from trainer.trainer_main import *
 from trainer.est_main import *
@@ -50,7 +53,7 @@ def main(config: ConfigParser):
     
 
     
-    list_ID_test = np.int_(np.arange(numb_training+1,numb_training+numb_testing+1))
+    list_ID_test = np.int_(np.arange(numb_training+1+1,numb_training+numb_testing+1))
     test_set = MicroscopyDataLoader(list_ID_test, **train_test_file_names)
     test_generator = DataLoader(test_set, **params_test)
     batch_size = config['data_loader']['args']['batch_size']
@@ -97,11 +100,13 @@ if __name__ == '__main__':
     args = argparse.ArgumentParser(description='training parameters')
     args.add_argument('-c', '--config', default="config_orientations_v2.json", type=str,
                       help='config file path (default: None)')
-    args.add_argument('-r', '--resume', default="/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_retrieve_pixOL_com_sym_90/0216_234122/model_best.pth", type=str,
+    args.add_argument('-r', '--resume', default='/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_corrected_angle_uniform_sampling_sym_89/0525_202932/model_best.pth', type=str,
                       help='path to latest checkpoint (default: None)')
     args.add_argument('-d', '--device', default=None, type=str,
                       help='indices of GPUs to enable (default: all)')
 
+                      #0515_203657
+#"/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_retrieve_pixOL_com_sym_90/0216_234122/model_best.pth"
                       #/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_retrieve_pixOL_com_sym_90/0210_011251
 
     CustomArgs = collections.namedtuple('CustomArgs', 'flags type target')
