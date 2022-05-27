@@ -22,8 +22,8 @@ class Trainer:
     Note:
         Inherited from BaseTrainer.
     """
-    def __init__(self, model, train_criterion, optimizer, config, data_loader,
-                 valid_data_loader_1SM=None, valid_data_loader_2SMs=None, test_data_loader=None, lr_scheduler=None, len_epoch=None,metric_for_val_1SM = None,metric_for_val_2SMs = None,metric_for_test=None):
+    def __init__(self, model,  optimizer, config, data_loader,
+                 test_data_loader=None, lr_scheduler=None, train_loss = None, train_loss_change = None, test_loss = None,len_epoch=None):
         # pass all variables to self
         #prepare the training device
         # setup GPU device if available, move model into configured device
@@ -36,7 +36,7 @@ class Trainer:
         if len(device_ids) > 1:
             self.model = torch.nn.DataParallel(model, device_ids=device_ids)
 
-        self.train_criterion = train_criterion 
+
         self.optimizer = optimizer
         self.config = config
         self.data_loader = data_loader
@@ -72,27 +72,20 @@ class Trainer:
             resume_checkpoint(self,self.config.resume)
 
         #training metric
-        self.metric_for_val_1SM = metric_for_val_1SM
-        self.metric_for_val_2SMs = metric_for_val_2SMs
-        self.metric_for_test = metric_for_test
 
-        self.valid_data_loader_1SM = valid_data_loader_1SM
-        self.valid_data_loader_2SMs = valid_data_loader_2SMs
         self.test_data_loader = test_data_loader
 
-        self.do_validation_1SM = self.valid_data_loader_1SM is not None
-        self.do_validation_2SMs = self.valid_data_loader_2SMs is not None
         self.do_test = self.test_data_loader is not None
 
         self.lr_scheduler = lr_scheduler
         self.log_step = int(np.sqrt(data_loader.batch_size))
 
-        #data save space 
         self.train_loss_list: List[float] = []
-        self.val_1SM_loss_list: List[float] = []
-        self.val_2SMs_loss_list: List[float] = []
         self.test_loss_list: List[float] = []
-        self.val_result = []
+
+        self.train_criterion = train_loss
+        self.train_criterion_change = train_loss_change
+        self.test_criterion = test_loss
 
 
         
@@ -111,27 +104,7 @@ class Trainer:
                 result = self._warmup_epoch(epoch)
             else:
                 result= train_epoch(self,epoch)
-            if self.do_validation_1SM:
-                if epoch==1:
-                    train_loss = result["loss"]
-                    Jaccard_1SM = result["Jaccard_1SM"]
-                    Jaccard_2SMs = result["Jaccard_2SMs"]
-                    RMSE_I_1SM = result["RMSE_I_1SM"]
-                    RMSE_I_2SMs = result["RMSE_I_2SMs"]
-                    RMSE_loc_1SM = result["RMSE_loc_1SM"]
-                    RMSE_loc_2SMs = result["RMSE_loc_2SMs"]
-                    test_loss = result["test_loss"]
-
-                else:
-                    train_loss = np.append(train_loss,result["loss"])
-                    Jaccard_1SM = np.append(Jaccard_1SM,result["Jaccard_1SM"])
-                    Jaccard_2SMs = np.append(Jaccard_2SMs,result["Jaccard_2SMs"])
-                    RMSE_I_1SM = np.append(RMSE_I_1SM,result["RMSE_I_1SM"])
-                    RMSE_I_2SMs = np.append(RMSE_I_2SMs,result["RMSE_I_2SMs"])
-                    RMSE_loc_1SM = np.append(RMSE_loc_1SM,result["RMSE_loc_1SM"])
-                    RMSE_loc_2SMs = np.append(RMSE_loc_2SMs,result["RMSE_loc_2SMs"])
-                    test_loss = np.append(test_loss,result["test_loss"])    
-            # save logged informations into log dict
+            
             log = {'epoch': epoch}
             for key, value in result.items():
                 log.update({key:value})
@@ -167,9 +140,6 @@ class Trainer:
                     break
             if ifSaveData == True:               
                 savedata2comet(self,epoch,best=best)
-                if self.do_validation_1SM:
-                    sio.savemat("save_output.mat",{'train_loss':train_loss,'Jaccard_1SM':Jaccard_1SM,'Jaccard_2SMs':Jaccard_2SMs,'RMSE_I_1SM':RMSE_I_1SM,'RMSE_I_2SMs':RMSE_I_2SMs,
-            'RMSE_loc_1SM':RMSE_loc_1SM,'RMSE_loc_2SMs':RMSE_loc_2SMs,'test_loss':test_loss})
             plt.close('all')
 
 

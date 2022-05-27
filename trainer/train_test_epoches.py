@@ -5,47 +5,32 @@ from tqdm import tqdm_notebook as tqdm
 import matplotlib.pyplot as plt
 from numpy import inf
 from trainer.trainer_utils import *
-from model.metric_v2 import postprocessingv2, RMSE_1SM_resnet
+from model.metric_v2 import postprocessingv2
+import model.loss as module_loss
 
 
 
 
 def train_epoch(self, epoch):
     print(epoch)
-    """
-    Training logic for an epoch
-
-    :param epoch: Current training epoch.
-    :return: A log that contains all information you want to save.
-
-    Note:
-        If you have additional information to record, for example:
-            > additional_log = {"x": x, "y": y}
-        merge it with log before return. i.e.
-            > log = {**log, **additional_log}
-            > return log
-
-        The metrics in log must have the key 'metrics'.
-    """  
-        
+           
     self.model.train()
 
     total_loss = 0
 
-
-    #with tqdm(self.data_loader) as progress:
     for batch_idx, (data, label,indx) in enumerate(self.data_loader):
         
-        #print(batch_idx)
-        #progress.set_description_str(f'Train epoch {epoch}')
-        
-        data, label = data.to(self.device), label.to(self.device)
-        
+        data, label = data.to(self.device), label.to(self.device)       
         output = self.model(data)
 
-        
-        # loss, loss_track = self.train_criterion(output, label)
-        loss,loss_track = self.train_criterion(output, label, self.config["scaling_factor"]) # Chaged for only localization
+       
+        if self.config['change_traing_loss_function']:
+            if epoch<self.config['epoch_change']:
+                loss,loss_track = self.train_criterion(output, label, self.config["scaling_factor"]) # Chaged for only localization
+            else:
+                loss,loss_track = self.train_criterion_change(output, label, self.config["scaling_factor"]) # Chaged for only localization
+        else:    
+                loss,loss_track = self.train_criterion(output, label, self.config["scaling_factor"]) # Chaged for only localization
 
         self.optimizer.zero_grad()
         loss.backward()
@@ -65,30 +50,14 @@ def train_epoch(self, epoch):
             self.writer.add_scalar({'loss_XY': loss_track[5]})
             self.writer.add_scalar({'loss_XZ': loss_track[6]})
             self.writer.add_scalar({'loss_YZ': loss_track[7]})
-        # self.writer.add_scalar({'loss_phi': loss_track[1]})
-        # self.writer.add_scalar({'loss_gamma': loss_track[2]})
-        # self.writer.add_scalar({'loss_intensity': loss_track[3]})
+
         
         self.train_loss_list.append(loss.item())
         total_loss += loss.item()
-        #total_metrics += self._eval_metrics(output, label)
 
+        # if batch_idx == self.len_epoch:
+        #     break
 
-        # if batch_idx % self.log_step == 0:
-
-            # progress.set_postfix_str(' {} Loss: {:.6f}'.format(
-            #     progress_bar(self,batch_idx),
-            #     loss.item()))
-            #self.writer.add_image('input', make_grid(data.cpu(), nrow=8, normalize=True))
-
-        if batch_idx == self.len_epoch:
-            break
-
-
-                    
-            
-        # if hasattr(self.data_loader, 'run'):
-    #     self.data_loader.run()
 
     log = {
         'loss': total_loss / self.len_epoch,
@@ -112,40 +81,26 @@ def train_epoch(self, epoch):
 
 def test_epoch(self, epoch):
     print(epoch)
-    """
-    Test after training an epoch
 
-    :return: A log that contains information about test
-
-    Note:
-        The Test metrics in log must have the key 'val_metrics'.
-    """
     self.model.eval()
     total_test_loss = 0
 
-    # results = np.zeros((len(self.test_data_loader.dataset), self.config['num_classes']), dtype=np.float32)
-    # tar_ = np.zeros((len(self.test_data_loader.dataset),), dtype=np.float32)
+
     with torch.no_grad():
-        #with tqdm(self.test_data_loader) as progress:
+        
         for batch_idx, (data, label,idx) in enumerate(self.test_data_loader):
-            #print(batch_idx)
-            #progress.set_description_str(f'Test epoch {epoch}')
+            
             data, label = data.to(self.device), label.to(self.device)
             output = self.model(data)
             
-            # loss,_ = self.val_criterion(output, label)
-            loss,loss_track = self.metric_for_test(output, label, self.config["scaling_factor"]) # Changed for only localization
+            #test_criterion = getattr(module_loss, self.config['test_loss'])
+            loss,loss_track = self.test_criterion(output, label, self.config["scaling_factor"]) # Chaged for only localization
 
             ifSaveData = self.config["comet"]["savedata"]
-
 
             self.test_loss_list.append(loss.item())
             total_test_loss += loss.item()
             
-            #self.writer.add_image('input', make_grid(data.cpu(), nrow=8, normalize=True))
-
-            # results[indexs.cpu().detach().numpy().tolist()] = output.cpu().detach().numpy().tolist()
-            # tar_[indexs.cpu().detach().numpy().tolist()] = label.cpu().detach().numpy().tolist()
     loss = total_test_loss / len(self.test_data_loader)
     save_output = [loss]
 

@@ -315,6 +315,7 @@ def postprocessingv2(config, outputGT, output, idx):
     has_SM = 0
 
     output = output.cpu().detach().numpy()
+    outputGT = outputGT.cpu().detach().numpy()
     B,L,H,W = np.shape(output)
 
     x_GT = int(H/2)  # for 1SM case, I know all the GT's position is at (1,1)

@@ -65,10 +65,10 @@ def main(config: ConfigParser):
     model = getattr(module_arch, config["arch"]["type"])()
 
     # get function handles of loss and metrics
-    train_loss = getattr(module_loss, config['train_loss'])
-    
-    val_1SM_loss_metri = getattr(module_metric, config['val_1SM_loss'])
-    val_2SMs_loss_metri = getattr(module_metric, config['val_2SMs_loss'])
+    #
+
+    train_loss_metri = getattr(module_loss, config['train_loss'])
+    train_loss_change_metri = getattr(module_loss, config['train_loss_change'])
     test_loss_metri = getattr(module_loss, config['test_loss'])
 
     # build optimizer, learning rate scheduler. delete every lines containing lr_scheduler for disabling scheduler
@@ -79,16 +79,14 @@ def main(config: ConfigParser):
     lr_scheduler = config.initialize('lr_scheduler', torch.optim.lr_scheduler, optimizer)
 
 
-    trainer = Trainer(model, train_loss, optimizer,
+    trainer = Trainer(model, optimizer,
                       config=config,
                       data_loader=training_generator,
-                      valid_data_loader_1SM=None,
-                      valid_data_loader_2SMs=None,
                       test_data_loader=test_generator,
                       lr_scheduler=lr_scheduler,
-                      metric_for_val_1SM = val_1SM_loss_metri,
-                      metric_for_val_2SMs = val_2SMs_loss_metri,
-                      metric_for_test=test_loss_metri)
+                      train_loss = train_loss_metri,
+                      train_loss_change = train_loss_change_metri,
+                      test_loss = test_loss_metri)
                                                                            
 
     trainer.train()
@@ -100,7 +98,7 @@ if __name__ == '__main__':
     args = argparse.ArgumentParser(description='training parameters')
     args.add_argument('-c', '--config', default="config_orientations_v2.json", type=str,
                       help='config file path (default: None)')
-    args.add_argument('-r', '--resume', default='/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_corrected_angle_uniform_sampling_sym_89/0525_202932/model_best.pth', type=str,
+    args.add_argument('-r', '--resume', default=None, type=str,
                       help='path to latest checkpoint (default: None)')
     args.add_argument('-d', '--device', default=None, type=str,
                       help='indices of GPUs to enable (default: all)')
