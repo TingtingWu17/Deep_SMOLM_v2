@@ -23,6 +23,7 @@ import random
 import numpy as np
 #import pixiedust
 import time
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 
 def main(config: ConfigParser):
@@ -38,7 +39,7 @@ def main(config: ConfigParser):
 'GT_image_name':config['training_dataset']['GT_image_name'],         'GT_list_name':config['training_dataset']['GT_list_name'], 
 'file_folder':config['training_dataset']['file_folder'],                                   
 'batch_size':config['data_loader']['args']['batch_size'],
-'setup_params':config['microscopy_params']['setup_params']}
+'setup_params':config['microscopy_params']['setup_params'], 'background_name':config['training_dataset']['background_name']}
        
     
    
@@ -75,6 +76,7 @@ def main(config: ConfigParser):
     trainable_params = filter(lambda p: p.requires_grad, model.parameters())
 
     optimizer = config.initialize('optimizer', torch.optim, [{'params': trainable_params}])
+    #scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=5, verbose=True, min_lr=1e-6)
 
     lr_scheduler = config.initialize('lr_scheduler', torch.optim.lr_scheduler, optimizer)
 
@@ -83,10 +85,7 @@ def main(config: ConfigParser):
                       config=config,
                       data_loader=training_generator,
                       test_data_loader=test_generator,
-                      lr_scheduler=lr_scheduler,
-                      train_loss = train_loss_metri,
-                      train_loss_change = train_loss_change_metri,
-                      test_loss = test_loss_metri)
+                      lr_scheduler=lr_scheduler)
                                                                            
 
     trainer.train()
@@ -98,13 +97,13 @@ if __name__ == '__main__':
     args = argparse.ArgumentParser(description='training parameters')
     args.add_argument('-c', '--config', default="config_orientations_v2.json", type=str,
                       help='config file path (default: None)')
-    args.add_argument('-r', '--resume', default=None, type=str,
+    args.add_argument('-r', '--resume', default="/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_retrieve_pixOL_com_sym_89/0601_225317/model_best.pth", type=str,
                       help='path to latest checkpoint (default: None)')
     args.add_argument('-d', '--device', default=None, type=str,
                       help='indices of GPUs to enable (default: all)')
 
                       #0515_203657
-#"/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_retrieve_pixOL_com_sym_90/0216_234122/model_best.pth"
+#"/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_retrieve_pixOL_com_sym_90/0527_185236/model_best.pth"
                       #/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_retrieve_pixOL_com_sym_90/0210_011251
 
     CustomArgs = collections.namedtuple('CustomArgs', 'flags type target')

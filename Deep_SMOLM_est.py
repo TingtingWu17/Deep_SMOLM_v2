@@ -50,7 +50,7 @@ def main(config: ConfigParser):
     # get function handles of loss and metrics
     
     
-    val_loss_metri = getattr(module_metric, config['val_loss'])
+
     
 
     # build optimizer, learning rate scheduler. delete every lines containing lr_scheduler for disabling scheduler
@@ -64,8 +64,7 @@ def main(config: ConfigParser):
     trainer = Est(model, optimizer,
                     config=config,
                     valid_data_loader=None,
-                    est_data_loader=est_generator,
-                    metric_for_val = val_loss_metri)
+                    est_data_loader=est_generator)
                                                                            
 
     #trainer.train()
@@ -77,7 +76,7 @@ if __name__ == '__main__':
     args = argparse.ArgumentParser(description='training parameters')
     args.add_argument('-c', '--config', default="config_orientations_v2.json", type=str,
                       help='config file path (default: None)')
-    args.add_argument('-r', '--resume', default="/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_corrected_angle_uniform_sampling_sym_89/0525_144540/model_best.pth", type=str,
+    args.add_argument('-r', '--resume', default="/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_corrected_angle_uniform_sampling_sym_89/0601_170945/model_best.pth", type=str,
                       help='path to latest checkpoint (default: None)')
                       #0513_121207 trained with l1-loss
                       #0512_140704 resnet 2nd moment

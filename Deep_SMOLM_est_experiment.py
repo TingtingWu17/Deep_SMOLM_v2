@@ -11,7 +11,8 @@ from data_loader.MicroscopyDataloader_est_experiment import MicroscopyDataLoader
 from torch.utils.data import DataLoader
 import model.loss as module_loss
 import model.metric_v2 as module_metric
-import model.model as module_arch
+#import model.model as module_arch
+import model.model_v2 as module_arch
 from parse_config import ConfigParser
 from trainer.trainer_main import *
 from trainer.est_main import *
@@ -31,7 +32,7 @@ def main(config: ConfigParser):
 
     for data_batch_cur in list_data_batch:
         for data_FoV_cur in list_data_FoV:
-
+            data_FoV_cur = data_FoV_cur
             params_est = {'batch_size':config['est_dataset_experiment']['batch_size'],'shuffle':False, 'num_workers':config['data_loader']['args']['num_workers']}
             
             est_file_names = {'noise_image_name':config['est_dataset_experiment']['noise_image_name'],
@@ -60,8 +61,6 @@ def main(config: ConfigParser):
             # get function handles of loss and metrics
             
             
-            val_loss_metri = getattr(module_metric, config['val_loss'])
-            
 
             # build optimizer, learning rate scheduler. delete every lines containing lr_scheduler for disabling scheduler
             trainable_params = filter(lambda p: p.requires_grad, model.parameters())
@@ -74,8 +73,7 @@ def main(config: ConfigParser):
             trainer = Est(model, optimizer,
                             config=config,
                             valid_data_loader=None,
-                            est_data_loader=est_generator,
-                            metric_for_val = val_loss_metri)
+                            est_data_loader=est_generator)
                                                                                 
 
             #trainer.train()
@@ -88,9 +86,10 @@ if __name__ == '__main__':
     args = argparse.ArgumentParser(description='training parameters')
     args.add_argument('-c', '--config', default="config_orientations_v2.json", type=str,
                       help='config file path (default: None)')
-    args.add_argument('-r', '--resume', default="/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_retrieve_pixOL_com_sym_90/0217_172852/model_best.pth", type=str,
+    args.add_argument('-r', '--resume', default="/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_retrieve_pixOL_com_sym_89/0601_231555/model_best.pth", type=str,
                       help='path to latest checkpoint (default: None)')
 
+                    #/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_retrieve_pixOL_com_sym_89/0530_235407     #trained with pixOL com using 523/610+unform [-150,150] z distribition;background in two channel don't fixed ratio, intesity is linear distribution
                       #/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_retrieve_pixOL_com_sym_90/0217_172852    #trained with pixOL com using 523/610+unform [-100,100] z distribition
                       #/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_retrieve_pixOL_com_sym_90/0215_231941    #trained with beads using 523/610 filter
                       #/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_retrieve_pixOL_com_sym_90/0211_004116/   #trained with beads using 593/45 filter

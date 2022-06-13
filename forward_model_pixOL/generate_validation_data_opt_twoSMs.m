@@ -41,8 +41,8 @@ pmask = 'pixOL_v12.bmp';
 basis_matrix_opt = forward_model_opt(pmask, image_size);
 pixel_size = 58.6; %in unit of um
 
-distance_differ_set = 140/pixel_size;%linspace(1,1000,30)/pixel_size; %in unit of pixel
-frame_per_state = 1000;
+distance_differ_set = linspace(1,1000,30)/pixel_size; %in unit of pixel
+frame_per_state = 1;
 %% user defined parameters
 %% gaussian filter
 h_shape = [7,7];
@@ -201,12 +201,17 @@ GT_list(7,:)=gamma_grd;
 
 image_with_poission_bkgdRmvd_up = image_with_poission_up-background;
 
-
-save([save_folder,'image_with_poission',num2str(ii),'.mat'],'image_with_poission');
-save([save_folder,'image_with_poission_bkgdRmvd_up',num2str(ii),'.mat'],'image_with_poission_bkgdRmvd_up');
-save([save_folder,'GT_list',num2str(ii),'.mat'],'GT_list');
-save([save_folder,'image_noiseless',num2str(ii),'.mat'],'image_noiseless');
+I_noise(ii,:,:) = [I_poissx,I_poissy];
+I_noiseless_save(ii,:,:) =[Ix,Iy];
+distance_differ_save(ii) = distance_differ_set(ii);
+GT_list_save(ii,:,:)=GT_list;
+% save([save_folder,'image_with_poission',num2str(ii),'.mat'],'image_with_poission');
+% save([save_folder,'image_with_poission_bkgdRmvd_up',num2str(ii),'.mat'],'image_with_poission_bkgdRmvd_up');
+% save([save_folder,'GT_list',num2str(ii),'.mat'],'GT_list');
+% save([save_folder,'image_noiseless',num2str(ii),'.mat'],'image_noiseless');
 
 
 
 end
+
+%save('2SMs_image_demo.mat','I_noise','I_noiseless_save','distance_differ_save','GT_list_save');
