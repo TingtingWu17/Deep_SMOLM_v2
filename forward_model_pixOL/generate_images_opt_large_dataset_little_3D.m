@@ -17,7 +17,7 @@ clc;
 % give the save address for generated data
 % ********************************
 
-save_folder = '/home/wut/Documents/Deep-SMOLM/data/opt_PSF_data_1000vs2/training_20220530_retrieve_pixOL_com_SNR2000vs6_randomxybkgration_corrected_gamma_normal_photon_linear_distribution_little_3D/'; 
+save_folder = '/home/wut/Documents/Deep-SMOLM/data/opt_PSF_data_1000vs2/training_20220530_retrieve_pixOL_com_SNR2000vs6_randomxybkgration_corrected_gamma_normal_photon_normal_distribution_little_3D/'; 
 % ********************************
 image_size = 60;  % the pixel size of the simulation image (feel free to change it)
 upsampling_ratio  = 6;
@@ -59,7 +59,7 @@ SM_num_range = 8;
 SM_num_min = 7;
 
 
-for ii = [6849:6849+32]+32%each 4 images, and total 2000*4 images
+for ii = [36769:36769+32]+32%each 4 images, and total 2000*4 images
 if rem(ii,100)==0
    ii
 end
