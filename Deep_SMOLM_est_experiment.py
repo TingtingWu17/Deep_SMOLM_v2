@@ -32,7 +32,7 @@ def main(config: ConfigParser):
 
     for data_batch_cur in list_data_batch:
         for data_FoV_cur in list_data_FoV:
-            data_FoV_cur = data_FoV_cur
+            data_FoV_cur = data_FoV_cur+18
             params_est = {'batch_size':config['est_dataset_experiment']['batch_size'],'shuffle':False, 'num_workers':config['data_loader']['args']['num_workers']}
             
             est_file_names = {'noise_image_name':config['est_dataset_experiment']['noise_image_name'],
@@ -86,9 +86,10 @@ if __name__ == '__main__':
     args = argparse.ArgumentParser(description='training parameters')
     args.add_argument('-c', '--config', default="config_orientations_v2.json", type=str,
                       help='config file path (default: None)')
-    args.add_argument('-r', '--resume', default="/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_retrieve_pixOL_com_sym_89/0601_231555/model_best.pth", type=str,
+    args.add_argument('-r', '--resume', default="/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_retrieve_pixOL_com_sym_89/0622_202722/model_best.pth", type=str,
                       help='path to latest checkpoint (default: None)')
-
+# 0622_202722  train with background
+# 0601_231555 train with background subtracted
                     #/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_retrieve_pixOL_com_sym_89/0530_235407     #trained with pixOL com using 523/610+unform [-150,150] z distribition;background in two channel don't fixed ratio, intesity is linear distribution
                       #/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_retrieve_pixOL_com_sym_90/0217_172852    #trained with pixOL com using 523/610+unform [-100,100] z distribition
                       #/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_retrieve_pixOL_com_sym_90/0215_231941    #trained with beads using 523/610 filter

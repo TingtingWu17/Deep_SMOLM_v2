@@ -48,7 +48,8 @@ class MicroscopyDataLoader():
             bkg_channel = bkg_channel.astype('float32') 
 
 
-        XY_channel = XY_channel-bkg_channel
+        XY_channel = XY_channel
+        #-bkg_channel
               
         Input_channel = XY_channel.astype('float32') 
             

@@ -1,12 +1,12 @@
 
 %
-function [line_all,theta,phi] = generate_phantom_SMs()
+function [line_all,theta,phi] = generate_phantom_SMs(Nsms)
 
 
 
 R = 1000; % unit: nm
 % line 1
-phi_circ = linspace(0,2*pi,100000);
+phi_circ = linspace(0,2*pi,Nsms);
 x_line1 = R*cos(phi_circ);
 y_line1 = R*sin(phi_circ);
 z_line1 = R*cos(phi_circ)*0;

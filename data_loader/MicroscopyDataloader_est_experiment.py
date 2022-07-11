@@ -30,11 +30,11 @@ class MicroscopyDataLoader_est_experiment():
        offset_image = sio.loadmat(self.file_folder+self.offset_name+str(self.data_FoV_cur)+'th_FoV.mat') 
        offset =np.array(offset_image['offset']) # 6 480 480 1
 
-       bkg_image = sio.loadmat(self.file_folder+"data"+str(self.data_batch_cur)+self.background_name+str(self.data_FoV_cur)+'th_FoV.mat') 
-       bkg =np.array(bkg_image['SMLM_bkg']) # 6 480 480 1
-       bkg[np.isnan(bkg)]=0
+       #bkg_image = sio.loadmat(self.file_folder+"data"+str(self.data_batch_cur)+self.background_name+str(self.data_FoV_cur)+'th_FoV.mat') 
+       #bkg =np.array(bkg_image['SMLM_bkg']) # 6 480 480 1
+       #bkg[np.isnan(bkg)]=0
        self.offset = np.float32(offset)
-       self.bkg = bkg
+       #self.bkg = bkg
         
         
         
@@ -58,8 +58,9 @@ class MicroscopyDataLoader_est_experiment():
         [H,W]=np.shape(Input_channel)
 
         idx2 = np.max((np.int_(np.round(self.list_IDs[idx]/50))-1,0))
-        bkg_cur = self.bkg[:,:,idx2]
-        Input_channel = np.float32(Input_channel)-self.offset-bkg_cur
+        #bkg_cur = self.bkg[:,:,idx2]
+        Input_channel = np.float32(Input_channel)-self.offset
+        #-bkg_cur
         Input_channel = self.tophoton*Input_channel
 
         #Input_channel = Input_channel.repeat(self.upsampling,axis=0).repeat(self.upsampling,axis=1)

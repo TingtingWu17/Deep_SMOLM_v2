@@ -78,23 +78,8 @@ if __name__ == '__main__':
                       help='config file path (default: None)')
     args.add_argument('-r', '--resume', default="/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_corrected_angle_uniform_sampling_sym_89/0601_170945/model_best.pth", type=str,
                       help='path to latest checkpoint (default: None)')
-                      #0513_121207 trained with l1-loss
-                      #0512_140704 resnet 2nd moment
-                      #0511_110720 noiseless without signal weighting w intensity MSE
-                      #0510_171145 noiseless without signal weighting
-                      #0506_155907 noiseless with signal weighting
-                      #0422_212013 #multilayerd gammalinear distribution+enhanced SNR 
-                      #0407_124133 #multilayerd gammalinear distribution
-                      #0406_235733 #multihead deep scaled cross term
-                    #"/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_corrected_angle_uniform_sampling_sym_90/0406_155446/model_best.pth"
-                      #/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_corrected_angle_uniform_sampling_sym_90/0406_102045/model_best.pth   # trained with pixOL perfect data using Deep-STORM3D+multihead
-                      #/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_corrected_angle_uniform_sampling_sym_90/0405_204415    # trained with pixOL perfect data using Deep-STORM3D
-                      #/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_retrieve_pixOL_com_sym_90/0217_172852    #trained with pixOL com using 523/610+unform [-100,100] z distribition
-                      #/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_retrieve_pixOL_com_sym_90/0215_231941    #trained with beads using 523/610 filter
-                      #/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_close2unifrm_sample_M_v2_sym_90/0206_130818
-                      #/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_M_close2uniform_sampled_sym_90/0128_001127
-                      #/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_corrected_angle_uniform_sampling_sym_90/0128_235439
-                      #/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_corrected_angle_uniform_sampling_sym_90/0204_110752
+                      #training_with_corrected_angle_uniform_sampling_sym_89/0601_170945               final best choice
+
     args.add_argument('-d', '--device', default=None, type=str,
                       help='indices of GPUs to enable (default: all)')
 

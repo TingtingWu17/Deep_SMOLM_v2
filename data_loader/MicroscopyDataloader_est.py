@@ -87,9 +87,10 @@ class MicroscopyDataLoader_est():
         XY_channel =np.array(noise_image[self.noise_image_name]) # 6 480 480 1
         #XY_channel = np.expand_dims(XY_channel,axis=-1)
         XY_channel = XY_channel.transpose(0,1,2) # 2 is the background
-        #XY_channel = np.repeat(XY_channel,6,axis=1)
-        #XY_channel = np.repeat(XY_channel,6,axis=2)
-        #XY_channel = normalize_im(XY_channel, dmean, dstd)
+
+        # XY_channel[XY_channel<0]=0
+        # XY_channel = XY_channel.astype('float32') 
+        # XY_channel = np.random.poisson(XY_channel)
                             
         
 

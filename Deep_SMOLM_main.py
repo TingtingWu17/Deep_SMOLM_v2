@@ -97,7 +97,7 @@ if __name__ == '__main__':
     args = argparse.ArgumentParser(description='training parameters')
     args.add_argument('-c', '--config', default="config_orientations_v2.json", type=str,
                       help='config file path (default: None)')
-    args.add_argument('-r', '--resume', default="/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_retrieve_pixOL_com_sym_89/0601_225317/model_best.pth", type=str,
+    args.add_argument('-r', '--resume', default='/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_retrieve_pixOL_com_sym_89/0622_172634/model_best.pth', type=str,
                       help='path to latest checkpoint (default: None)')
     args.add_argument('-d', '--device', default=None, type=str,
                       help='indices of GPUs to enable (default: all)')

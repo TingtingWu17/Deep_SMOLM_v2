@@ -6,6 +6,27 @@ from skimage.measure import label
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import signal
+import cv2 as cv
+
+def matlab_style_gauss2D(shape,sigma):
+    """ 
+    2D gaussian filter - should give the same result as:
+    MATLAB's fspecial('gaussian',[shape],[sigma]) 
+    """
+    m,n = [(ss-1.)/2. for ss in shape]
+    y,x = np.ogrid[-m:m+1,-n:n+1]
+    h = np.exp( -(x*x + y*y) / (2*sigma**2) )
+    #h.astype(dtype=K.floatx())
+    h[ h < np.finfo(h.dtype).eps*h.max() ] = 0
+    sumh = h.sum()
+    if sumh != 0:
+        h /= sumh
+    h = h*2.0
+    maxV = h.max()
+    h = h/maxV
+    #print("max"+str(maxV))
+    h = h.astype('float32')
+    return h
 
 
 def postprocessing(config, output,idx):
@@ -27,7 +48,7 @@ def postprocessing(config, output,idx):
     for ii in range(B):
         pre_est_cur = output[ii,:,:,:]
         #I_thresh = 50
-        x_est_save,y_est_save, est_img_crop = postprocessing_loc_v2(pre_est_cur, I_thresh)
+        x_est_save,y_est_save, est_img_crop = postprocessing_loc_v4(pre_est_cur, I_thresh)
         N_SM = np.size(x_est_save)
         if N_SM==0:
            aaa=1
@@ -260,6 +281,67 @@ def postprocessing_loc_v2(est_images, I_thresh):
     rad = 3
     I_img = np.sum(est_images[0:3,:,:],axis=0)
     I_mask = I_img > I_thresh
+    mask_label = label(I_mask)
+    #print(np.sum(mask_label != 0))
+    [H,W]=np.shape(I_img)
+    N_SM = np.max(mask_label)
+    if N_SM==0:
+        x_est_save = []
+        y_est_save = []
+        est_img_crop = []
+    else:
+        x_est_save = np.zeros((N_SM,1)) 
+        x_est_save[:]=np.NaN       
+        y_est_save = np.zeros((N_SM,1))
+        y_est_save[:]=np.NaN   
+        est_img_crop = np.zeros((N_SM,channels,2*rad+1,2*rad+1))
+        est_img_crop[:]=np.NaN   
+        
+        
+        #print(np.max(mask_label))
+        for ii in range(0, np.max(mask_label)):
+            #k = np.argwhere(mask_label == ii)
+            k = mask_label == ii+1
+            # Find the position with the max intensity
+            I_img_tmp = I_img.copy()
+            I_img_tmp[~k] = 0
+            indx_max = (I_img_tmp == np.max(I_img[k]))
+            #print(indx_max)
+            # in each block, use the pixel with the maximum intensity estimation as the estimated x,y locations
+            x_est, y_est = np.argwhere(indx_max == 1)[0,:]#.squeeze()
+            #print(x_est, y_est)
+            if x_est>rad and x_est+rad<W and y_est>rad and y_est+rad<H:
+
+                x_est_save[ii] = y_est
+                y_est_save[ii] = x_est
+
+                est_img_crop[ii,:,:,:] = est_images[:,x_est-rad:x_est+rad+1,y_est-rad:y_est+rad+1]
+               
+            
+        est_img_crop = est_img_crop[~np.isnan(est_img_crop)]
+        est_img_crop = np.reshape(est_img_crop,(-1,channels,2*rad+1,2*rad+1))
+        x_est_save = x_est_save[~np.isnan(x_est_save)]
+        x_est_save = np.reshape(x_est_save,(-1,1))
+        y_est_save = y_est_save[~np.isnan(y_est_save)]
+        y_est_save = np.reshape(y_est_save,(-1,1))
+
+           
+    
+    return x_est_save,y_est_save, est_img_crop
+
+
+def postprocessing_loc_v4(est_images, I_thresh):
+    # pre_est: output image from the network
+    channels = np.size(est_images,axis=0)
+    rad = 3
+    I_img = np.sum(est_images[0:3,:,:],axis=0)
+    g = matlab_style_gauss2D([7,7],1)
+    res = cv.matchTemplate(I_img,g,cv.TM_CCOEFF)
+    temp = I_img*0
+    temp[3:-3,3:-3]=res
+    I_mask = temp[:,:]>200
+
+    #I_mask = I_img > I_thresh
     mask_label = label(I_mask)
     #print(np.sum(mask_label != 0))
     [H,W]=np.shape(I_img)
