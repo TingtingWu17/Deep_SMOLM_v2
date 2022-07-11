@@ -76,9 +76,11 @@ if __name__ == '__main__':
     args = argparse.ArgumentParser(description='training parameters')
     args.add_argument('-c', '--config', default="config_orientations_v2.json", type=str,
                       help='config file path (default: None)')
-    args.add_argument('-r', '--resume', default="/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_corrected_angle_uniform_sampling_sym_89/0601_170945/model_best.pth", type=str,
+    args.add_argument('-r', '--resume', default="/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_retrieve_pixOL_com_sym_89/0709_175726/model_best.pth", type=str,
                       help='path to latest checkpoint (default: None)')
-                      #training_with_corrected_angle_uniform_sampling_sym_89/0601_170945               final best choice
+                      #training_with_corrected_angle_uniform_sampling_sym_89/0601_170945               final best choice for simulated data
+                      #training_with_retrieve_pixOL_com_sym_89/0622_202722/model_best.pth              final best choice for experimental data with focal plane drift(trained with background)
+                      #/training_with_retrieve_pixOL_com_sym_89/0709_175726                            final best choice for experimental data without focal plane drift(trained with background)
 
     args.add_argument('-d', '--device', default=None, type=str,
                       help='indices of GPUs to enable (default: all)')

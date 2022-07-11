@@ -4,59 +4,6 @@ import numpy as np
 from IPython.core.debugger import set_trace
 import scipy.io as sio
 
-def GT_list_to_grid(GT_list, setup_params):
-    
-    #GT_list: x,y,intensity,theta,phi,gamma
-    # calculate upsampling factor
-    pixel_sz_org, upsampling_ratio = setup_params['pixel_sz_org'], setup_params['upsampling_ratio']
-    pixel_sz_up = pixel_sz_org*upsampling_ratio
-    
-    
-    # current dimensions # before upsampling
-    H, W = setup_params['H'], setup_params['W']
-    H_up, W_up = int(H*upsampling_ratio),int(W*upsampling_ratio)
-    
-    x_list = GT_list[:,:,0]
-    y_list = GT_list[:,:,1]
-    intensity_list = GT_list[:,:,2].flatten()
-    theta_list = GT_list[:,:,3].flatten()
-    phi_list = GT_list[:,:,4].flatten()
-    gamma_list = GT_list[:,:,5].flatten()
-    
-    # number of particles
-    batch_size, num_particles = x_list.shape
-    
-    # project xyz locations on the grid and shift xy to the upper left corner
-    xg = (np.floor(x_list/pixel_sz_up) + np.floor(W_up/2)).astype('int')
-    yg = (np.floor(y_list/pixel_sz_up) + np.floor(H_up/2)).astype('int')
-
-    
-    # indices for sparse tensor
-    indX, indY = (xg.flatten('F')).tolist(), (yg.flatten('F')).tolist()
-
-    
-    # if sampling a batch add a sample index
-#     if batch_size > 1:
-    indS = (np.kron(np.ones(num_particles), np.arange(0, batch_size, 1)).astype('int')).tolist()
-    ibool = torch.LongTensor([indS, indY, indX])
-#     else:
-#         ibool = torch.LongTensor([indY, indX])
-    
-    
-    # resulting 3D boolean tensor
-#     if batch_size > 1:
-    intensity_grid = torch.sparse.FloatTensor(ibool, intensity_list, torch.Size([batch_size, H, W])).to_dense()
-    theta_grid = torch.sparse.FloatTensor(ibool, theta_list, torch.Size([batch_size, H, W])).to_dense()
-    phi_grid = torch.sparse.FloatTensor(ibool, phi_list, torch.Size([batch_size, H, W])).to_dense()
-    gamma_grid = torch.sparse.FloatTensor(ibool, gamma_list, torch.Size([batch_size, H, W])).to_dense()
-#     else:
-#         intensity_grid = torch.sparse.FloatTensor(ibool, intensity_list, torch.Size([H, W])).to_dense()
-#         theta_grid = torch.sparse.FloatTensor(ibool, theta_list, torch.Size([H, W])).to_dense()
-#         phi_grid = torch.sparse.FloatTensor(ibool, phi_list, torch.Size([H, W])).to_dense()
-#         gamma_grid = torch.sparse.FloatTensor(ibool, gamma_list, torch.Size([h_size, H, W])).to_dense()
-    
-    return intensity_grid,theta_grid,phi_grid,gamma_grid
-
 
 class MicroscopyDataLoader_est():
 
@@ -102,7 +49,8 @@ class MicroscopyDataLoader_est():
             bkg_channel =bkg_channel.transpose(0,1,2)
             bkg_channel = bkg_channel.astype('float32') 
 
-        Input_channel = XY_channel.astype('float32')-bkg_channel 
+        #Input_channel = XY_channel.astype('float32')-bkg_channel 
+        Input_channel = XY_channel.astype('float32')
 
         if self.GT_list_name != "":
             GT_list = sio.loadmat(self.file_folder+"/"+self.GT_list_name+ID+'.mat') 

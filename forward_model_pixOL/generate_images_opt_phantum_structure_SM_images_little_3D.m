@@ -17,13 +17,13 @@ clc;
 % give the save address for generated data
 % ********************************
 
-save_folder = '/home/wut/Documents/Deep-SMOLM/data/opt_PSF_data_1000vs2/phantom_20220216_dense_SMs_1000vs4_retrived_pixOL_com_non_unofrm_bkg_in_two_channels_little_z/'; 
+save_folder = '/home/wut/Documents/Deep-SMOLM/data/opt_PSF_data_1000vs2/phantom_20220708_dense_SMs_2000vs6_retrived_pixOL_com_little_z/'; 
 % ********************************
-image_size = 88;  % the pixel size of the simulation image (feel free to change it)
+image_size = 68;  % the pixel size of the simulation image (feel free to change it)
 upsampling_ratio  = 6;
 pmask = 'pixOL_v12';
 %basis_matrix_opt = forward_model_opt(pmask, image_size);
-pmask_retrieve_name = '20220214_pixOL_com_retrieve.mat';
+pmask_retrieve_name = '20220528_pixOLcom_retrieved.mat';
 
 
 %
@@ -31,7 +31,7 @@ pixel_size_xy = 58.5; %in unit of nm
 pixel_size_z = 20; % in unit of nm
 
 NFP = 0; %(nm); NFP: Normal forcal plane
-z_range_phy = [-100,100]; %(nm); the axial location range of SMs
+z_range_phy = [-150,150]; %(nm); the axial location range of SMs
 %load('imgPara');
 %##############run thes two lines only if you change the parameters#############
 imgPara = forward_model_opt_3D_retrieved(pmask, image_size,NFP,z_range_phy,pixel_size_xy,pixel_size_z,pmask_retrieve_name);
@@ -39,7 +39,7 @@ imgPara = forward_model_opt_3D_retrieved(pmask, image_size,NFP,z_range_phy,pixel
 %###########################################################################
 imgPara.img_sizex = image_size;
 imgPara.img_sizey = image_size;
-f_forwardModel = @(x,G_re,b) abs((G_re*x)+b);
+f_forwardModel = @(x,G_re) abs((G_re*x));
 
 %% gaussian filter
 h_shape = [7,7];
@@ -53,7 +53,7 @@ h = h./max(max(h));
 
 n_images = 1; % the simulated image numbers (feel free to change it)
 signal= 1000; %(feel free to change it)
-background_avg=4; %(feel free to change it)
+background_avg=6; %(feel free to change it)
 %signal_sigma = 2000;
 % SM_num_range = 8;
 % SM_num_min = 7;
@@ -89,7 +89,7 @@ y_SMs = xyz_choice(2,SM_idx)/pixel_size_xy; %y location, in unit of pixles
 z_SMs = (rand(1,n_SMs)*200-100)/pixel_size_z;
 %temp = (poissrnd(3,1,100000)+normrnd(0,1,1,100000)-0.5)*350; temp(temp<100)=[]; hist(temp,1000); mean(temp)
 temp = (poissrnd(3,1,100)+normrnd(0,1,1,100)-0.5)*350; temp(temp<100)=[];
-signal_SMs = temp(1:n_SMs);
+signal_SMs = temp(1:n_SMs)*2;
 x_SMs_phy = x_SMs*pixel_size_xy;
 y_SMs_phy = y_SMs*pixel_size_xy;
 z_SMs_phy = z_SMs*pixel_size_z;
@@ -99,12 +99,10 @@ x_grd(1:n_SMs) = x_SMs.'; y_grd(1:n_SMs) = y_SMs.';  x_phy(1:n_SMs) = x_SMs_phy.
 thetaD_grd(1:n_SMs) = thetaD_SMs.'; phiD_grd(1:n_SMs)=phiD_SMs.'; 
 gamma_grd(1:n_SMs) = gamma_SMs.'; I_grd(1:n_SMs) = signal_SMs.'; 
 
-background = rand(1)*2-1+background_avg;
-bkg_img = [ones(image_size,image_size)*background,ones(image_size,image_size)*background*1.145];
-bkg_img_up1 = imresize(bkg_img(:,1:image_size),[image_size,image_size]*upsampling_ratio,'box');  
-bkg_img_up2 = imresize(bkg_img(:,image_size+1:image_size*2),[image_size,image_size]*upsampling_ratio,'box');
-bkg_img_up(1,:,:)=bkg_img_up1;
-bkg_img_up(2,:,:)=bkg_img_up2;
+
+bkg_img = [ones(image_size,image_size)*background_avg,ones(image_size,image_size)*background_avg*1.145];
+bkg_img1(1,:,:)=bkg_img(:,1:image_size);
+bkg_img1(2,:,:)=bkg_img(:,image_size+1:image_size*2);
 
 %% forward imaging system
 
@@ -114,8 +112,9 @@ M = [muxx;muyy;muzz;muxy;muxz;muyz];
 
 [lambda,loc] = generate_lambda(signal_SMs,x_SMs_phy,y_SMs_phy,z_SMs_phy,M,imgPara);
 [G_re,loc_re_new,lambda] = update_basisMatrix(n_SMs,lambda,loc,imgPara);
-I_SMs = f_forwardModel(lambda,G_re,background);
+I_SMs = f_forwardModel(lambda,G_re);
 I_SMs = reshape(I_SMs,image_size,image_size*2);
+I_SMs = I_SMs+bkg_img;
 I_SMsx = I_SMs(1:image_size,1:image_size,:);
 I_SMsy = I_SMs(1:image_size,image_size+1:image_size*2,:);
 
@@ -174,20 +173,16 @@ end
 I_poissx = poissrnd(Ix); % if you need multiple realization for a single ground truth, modify here
 %imagesc(I_poiss); axis image;
 I_poissy = poissrnd(Iy);
-I_poissx_up = imresize(I_poissx,[image_size,image_size]*upsampling_ratio,'box');  
-I_poissy_up = imresize(I_poissy,[image_size,image_size]*upsampling_ratio,'box'); 
-Ix_up = imresize(Ix,[image_size,image_size]*upsampling_ratio,'box');  
-Iy_up = imresize(Iy,[image_size,image_size]*upsampling_ratio,'box'); 
+
+
 
 %save ground truth and image
 image_with_poission(1,:,:) = I_poissx;
 image_with_poission(2,:,:) = I_poissy;
-image_with_poission_up(1,:,:) = I_poissx_up;
-image_with_poission_up(2,:,:) = I_poissy_up;
+
 image_noiseless(1,:,:) = Ix;
 image_noiseless(2,:,:) = Iy;
-% image_noiseless_up(1,:,:) = Ix_up;
-% image_noiseless_up(2,:,:) = Iy_up;
+
 image_GT_up(1,:,:) = I_intensity_up;
 image_GT_up(2,:,:) = I_theta_up;
 image_GT_up(3,:,:) = I_phi_up;
@@ -199,27 +194,23 @@ image_GT_up(8,:,:) = I_sZZ;
 image_GT_up(9,:,:) = I_sXY;
 image_GT_up(10,:,:) = I_sXZ;
 image_GT_up(11,:,:) = I_sYZ;
-GT_list(1,:)=ii*ones(size(x_phy));
+GT_list(1,:)=ones(size(x_phy))*ii;
 GT_list(2,:)=x_phy;
 GT_list(3,:)=y_phy;
 GT_list(4,:)=I_grd;
 GT_list(5,:)=thetaD_grd;
 GT_list(6,:)=phiD_grd;
 GT_list(7,:)=gamma_grd;
-img_bkg = background;
+img_bkg = bkg_img1;
 
-%image_with_poission_bkgdRmvd = image_with_poission-background;
-image_with_poission_bkgdRmvd_up = image_with_poission_up-bkg_img_up;
+
 
 
 save([save_folder,'image_with_poission',num2str(ii),'.mat'],'image_with_poission');
-%save([save_folder,'image_with_poission_up',num2str(ii),'.mat'],'image_with_poission_up');
 save([save_folder,'img_bkg',num2str(ii),'.mat'],'img_bkg');
-save([save_folder,'image_with_poission_bkgdRmvd_up',num2str(ii),'.mat'],'image_with_poission_bkgdRmvd_up');
 save([save_folder,'image_GT_up',num2str(ii),'.mat'],'image_GT_up');
 save([save_folder,'GT_list',num2str(ii),'.mat'],'GT_list');
 save([save_folder,'image_noiseless',num2str(ii),'.mat'],'image_noiseless');
-%save([save_folder,'image_noiseless_up',num2str(ii),'.mat'],'image_noiseless_up');
 
 
 

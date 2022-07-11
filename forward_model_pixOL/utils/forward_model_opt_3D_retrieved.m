@@ -5,7 +5,7 @@ emitter_wavelength = 610; %nm
 refractiveIndx=1.515;% objective refractive index
 sampleRefractiveIndx=1.314;% sample refractive index
 
-left_to_right_trans_ratio = 1; %transmit_ratio_L2R; for Di03-R488/561,523/610 bandpass; y channel.x channel
+left_to_right_trans_ratio = 1.114; %transmit_ratio_L2R; for Di03-R488/561,523/610 bandpass; y channel.x channel
 %1.5350;%transmit_ratio_L2R; for Di03-R488/561, 593/46; y channel.x channel
 zerothOrder = [0,0];%zerothOrder_RL;
 %construct phasemaskpara

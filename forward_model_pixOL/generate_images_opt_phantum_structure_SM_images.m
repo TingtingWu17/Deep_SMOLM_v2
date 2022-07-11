@@ -17,7 +17,7 @@ clc;
 % give the save address for generated data
 % ********************************
 
-save_folder = '/home/wut/Documents/Deep-SMOLM/data/opt_PSF_data_1000vs2/phantom_20220616_dense_SMs_1000vs2/'; 
+save_folder = '/home/wut/Documents/Deep-SMOLM/data/opt_PSF_data_1000vs2/phantom_20220616_dense_SMs_1000vs2_omega_2/'; 
 % ********************************
 image_size = 68;  % the pixel size of the simulation image (feel free to change it)
 upsampling_ratio  = 6;
@@ -68,7 +68,7 @@ n_SMs = floor(rand(1)*SM_num_range+SM_num_min); % number of single molecules
 SM_idx = min(length(theta_choice),max(1,round(rand(n_SMs,1)*length(theta_choice))));
 thetaD_SMs = theta_choice(SM_idx)/pi*180;
 phiD_SMs = phi_choice(SM_idx)/pi*180;
-gamma_SMs = ones(size(phiD_SMs));
+gamma_SMs = ones(size(phiD_SMs))*0.573;
 
 x_SMs = xyz_choice(1,SM_idx)/pixel_size; %x location, in unit of pixles
 y_SMs = xyz_choice(2,SM_idx)/pixel_size; %y location, in unit of pixles

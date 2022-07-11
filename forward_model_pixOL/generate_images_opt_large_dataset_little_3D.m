@@ -17,13 +17,13 @@ clc;
 % give the save address for generated data
 % ********************************
 
-save_folder = '/home/wut/Documents/Deep-SMOLM/data/opt_PSF_data_1000vs2/training_20220530_retrieve_pixOL_com_SNR2000vs6_randomxybkgration_corrected_gamma_normal_photon_normal_distribution_little_3D/'; 
+save_folder = '/home/wut/Documents/Deep-SMOLM/data/opt_PSF_data_1000vs2/training_20220711_pixOL_SNR1000vs2_gamma_linear_photon_poisson_distribution_gradient_model/'; 
 % ********************************
 image_size = 60;  % the pixel size of the simulation image (feel free to change it)
 upsampling_ratio  = 6;
 pmask = 'pixOL_v12';
 %basis_matrix_opt = forward_model_opt(pmask, image_size);
-pmask_retrieve_name = '20220528_pixOLcom_retrieved.mat';
+%pmask_retrieve_name = '20220528_pixOLcom_retrieved.mat';
 
 
 %
@@ -34,7 +34,8 @@ NFP = 0; %(nm); NFP: Normal forcal plane
 z_range_phy = [-150,150]; %(nm); the axial location range of SMs
 %load('imgPara');
 %##############run thes two lines only if you change the parameters#############
-imgPara = forward_model_opt_3D_retrieved(pmask, image_size,NFP,z_range_phy,pixel_size_xy,pixel_size_z,pmask_retrieve_name);
+%imgPara = forward_model_opt_3D_retrieved(pmask, image_size,NFP,z_range_phy,pixel_size_xy,pixel_size_z,pmask_retrieve_name);
+imgPara = forward_model_opt_3D(pmask, image_size,NFP,z_range_phy,pixel_size_xy,pixel_size_z);
 %save('imgPara.mat','imgPara');
 %###########################################################################
 imgPara.img_sizex = image_size;
@@ -53,13 +54,13 @@ h = h./max(max(h));
 
 n_images = 1; % the simulated image numbers (feel free to change it)
 signal= 1000; %(feel free to change it)
-background_avg=6; %(feel free to change it)
+background_avg=2; %(feel free to change it)
 %signal_sigma = 2000;
 SM_num_range = 8;
 SM_num_min = 7;
 
 
-for ii = [36769:36769+32]+32%each 4 images, and total 2000*4 images
+for ii = 1:30000%each 4 images, and total 2000*4 images
 if rem(ii,100)==0
    ii
 end
@@ -88,11 +89,12 @@ n_SMs = floor(rand(1)*SM_num_range+SM_num_min); % number of single molecules
 
 x_SMs = (0.10+0.8*rand(1,n_SMs))*pixel_size_xy-(pixel_size_xy)/2; %x location, in unit of pixles
 y_SMs = (0.10+0.8*rand(1,n_SMs))*pixel_size_xy-(pixel_size_xy)/2; %y location, in unit of pixles
-z_SMs = (rand(1,n_SMs)*300-150)/pixel_size_z;
+%z_SMs = (rand(1,n_SMs)*300-150)/pixel_size_z;
+z_SMs = (rand(1,n_SMs)*300-150)/pixel_size_z*0;
 %temp=generateSignal_distribution(); temp(temp<100)=[];
 %temp = (poissrnd(3,1,100000)+normrnd(0,1,1,100000)-0.5)*350; temp(temp<100)=[]; hist(temp,1000); mean(temp)
 temp = (poissrnd(3,1,100)+normrnd(0,1,1,100)-0.5)*350; temp(temp<80)=[];
-temp = temp*2;
+temp = temp;
 signal_SMs = temp(1:n_SMs);
 x_SMs_phy = x_SMs*pixel_size_xy;
 y_SMs_phy = y_SMs*pixel_size_xy;

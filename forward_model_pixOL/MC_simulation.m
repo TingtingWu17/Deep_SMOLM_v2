@@ -33,7 +33,7 @@ clc;
 
 % give the save address for generated data
 % ********************************
-save_folder = '/home/wut/Documents/Deep-SMOLM/data/opt_PSF_data_1000vs2/MC_simulation_20220518_SNR1000vs2_omega0_random_loc/'; 
+save_folder = '/home/wut/Documents/Deep-SMOLM/data/opt_PSF_data_1000vs2/MC_simulation_20220630_SNR1000vs2_omega2_random_loc/'; 
 % ********************************
 image_size = 32;  % the pixel size of the simulation image (feel free to change it)
 upsampling_ratio  = 6;
@@ -62,7 +62,7 @@ u=linspace(0.50,0.995,30);
 phiD_simulate=2*pi*v/pi*180;
 thetaD_simulate=acos(2*u-1)/pi*180;
 omega_simulate = 0;
-gamma_simulate = 1;%0.5732;
+gamma_simulate = 0.5732;
 frame_per_state = 200;
 count = 0;
 %%

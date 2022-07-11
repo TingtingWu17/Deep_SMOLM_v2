@@ -41,9 +41,9 @@ pmask = 'pixOL_v12.bmp';
 basis_matrix_opt = forward_model_opt(pmask, image_size);
 pixel_size = 58.6; %in unit of um
 
-distance_differ_set = linspace(1,1000,30)/pixel_size; %in unit of pixel
-%distance_differ_set = 180/pixel_size;
-frame_per_state = 1;
+%distance_differ_set = linspace(1,1000,30)/pixel_size; %in unit of pixel
+distance_differ_set = 180/pixel_size;
+frame_per_state = 3000;
 %% user defined parameters
 %% gaussian filter
 h_shape = [7,7];
