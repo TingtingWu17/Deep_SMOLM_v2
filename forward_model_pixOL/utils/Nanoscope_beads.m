@@ -1135,8 +1135,8 @@ classdef Nanoscope_beads
             %--------------------------------------------------------
             imgy = abs(imgy).^2;
             imgx = abs(imgx).^2;
-            imgx = imgaussfilt(imgx,1);
-            imgy = imgaussfilt(imgy,1);
+            %imgx = imgaussfilt(imgx,1);
+            %imgy = imgaussfilt(imgy,1);
             
             
         end

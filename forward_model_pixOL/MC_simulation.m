@@ -28,8 +28,8 @@
 
 
 %% image generation
-clear;
-clc;
+%clear;
+%clc;
 
 % give the save address for generated data
 % ********************************
@@ -90,8 +90,8 @@ gamma_SMs = gamma_simulate;
 
 % x_SMs = 0;%(0.9999*rand(1)-1/2)/upsampling_ratio; %x location, in unit of pixles
 % y_SMs = 0;%(0.9999*rand(1)-1/2)/upsampling_ratio;%y location, in unit of pixles
-x_SMs = (1*rand(1)-1/2); %x location, in unit of pixles
-y_SMs = (1*rand(1)-1/2);%y location, in unit of pixles
+x_SMs = 0.0;%(1*rand(1)-1/2); %x location, in unit of pixles
+y_SMs = 0.0;%(1*rand(1)-1/2);%y location, in unit of pixles
 temp = (poissrnd(3,1,100)+normrnd(0,1,1,100)-0.5)*350; temp(temp<100)=[];
 %signal_SMs = temp(1:n_SMs);
 signal_SMs = 1000;

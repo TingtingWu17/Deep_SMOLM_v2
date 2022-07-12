@@ -10,7 +10,7 @@ Microscopy.upsampling = 1;
 Microscopy.pix_size=6500/Microscopy.pixelSizeUpsampling;
 Microscopy.bfp_radius = 80*Microscopy.upsampling;
 Microscopy.Magnitude = 111.1111;
-Microscopy.sampling_size = round(1.541e5*Microscopy.wavelength*Microscopy.Magnitude*Microscopy.bfp_radius/Microscopy.NA)*Microscopy.pixelSizeUpsampling-1;
+Microscopy.sampling_size = round(1.541e5*Microscopy.wavelength*Microscopy.Magnitude*Microscopy.bfp_radius/Microscopy.NA)*Microscopy.pixelSizeUpsampling;
 
 Microscopy.image_size =image_size*Microscopy.pixelSizeUpsampling;
 %

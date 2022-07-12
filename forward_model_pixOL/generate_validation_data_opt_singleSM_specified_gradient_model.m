@@ -17,7 +17,7 @@ clc;
 % give the save address for generated data
 % ********************************
 
-save_folder = 'C:\Users\wu.t\OneDrive - Washington University in St. Louis\github\data for Deep-SMOLM\validation_20220711_SNR1000vs2_1SM_0303upsampled_gradient_model\'; 
+save_folder = '/home/wut/Documents/Deep-SMOLM/data/opt_PSF_data_1000vs2/validation_20220711_SNR1000vs2_1SM_0000upsampled_gradient_model/'; 
 % ********************************
 image_size = 32;  % the pixel size of the simulation image (feel free to change it)
 upsampling_ratio  = 6;
@@ -60,7 +60,7 @@ SM_num_range = 8;
 SM_num_min = 7;
 
 
-for ii = 1:30000%each 4 images, and total 2000*4 images
+for ii = 1:2000%each 4 images, and total 2000*4 images
 if rem(ii,100)==0
    ii
 end
@@ -77,9 +77,9 @@ image_with_poission = zeros(2,image_size,image_size);
 image_with_poission_up = zeros(2,image_size*upsampling_ratio,image_size*upsampling_ratio);
 image_GT_up = zeros(5,image_size*upsampling_ratio,image_size*upsampling_ratio);
 
-n_SMs = floor(rand(1)*SM_num_range+SM_num_min); % number of single molecules
-%[thetaD_SMs,phiD_SMs,gamma_SMs] = generate_rand_angleD(n_SMs);
-[thetaD_SMs,phiD_SMs,gamma_SMs] = generate_rand_angleD_gamma_linear_distribution(n_SMs);
+n_SMs = 1; %floor(rand(1)*SM_num_range+SM_num_min); % number of single molecules
+[thetaD_SMs,phiD_SMs,gamma_SMs] = generate_rand_angleD(n_SMs);
+%[thetaD_SMs,phiD_SMs,gamma_SMs] = generate_rand_angleD_gamma_linear_distribution(n_SMs);
 %[thetaD_SMs,phiD_SMs,gamma_SMs] = generate_rand_angleD_with_M_uniformly_sampled_v2(n_SMs);
 
 %theta angle of SMs, note theta is in the range of (0,90) degree
@@ -87,15 +87,15 @@ n_SMs = floor(rand(1)*SM_num_range+SM_num_min); % number of single molecules
 %gamma (orientaiton constraint) is used to represent alpha angle. it is in the range of (0,1)
 
 
-x_SMs = 3/upsampling_ratio;%(0.9999*rand(1)-1/2)/upsampling_ratio; %x location, in unit of pixles
-y_SMs = 3/upsampling_ratio;%(0.9999*rand(1)-1/2)/upsampling_ratio;%y location, in unit of pixles
+x_SMs = 0.0/upsampling_ratio;%(0.9999*rand(1)-1/2)/upsampling_ratio; %x location, in unit of pixles
+y_SMs = 0.0/upsampling_ratio;%(0.9999*rand(1)-1/2)/upsampling_ratio;%y location, in unit of pixles
 %z_SMs = (rand(1,n_SMs)*300-150)/pixel_size_z;
-z_SMs = (rand(1,n_SMs)*300-150)/pixel_size_z*0;
+z_SMs = 0;
 %temp=generateSignal_distribution(); temp(temp<100)=[];
 %temp = (poissrnd(3,1,100000)+normrnd(0,1,1,100000)-0.5)*350; temp(temp<100)=[]; hist(temp,1000); mean(temp)
 temp = (poissrnd(3,1,100)+normrnd(0,1,1,100)-0.5)*350; temp(temp<80)=[];
 temp = temp;
-signal_SMs = temp(1:n_SMs);
+signal_SMs = 1000;
 x_SMs_phy = x_SMs*pixel_size_xy;
 y_SMs_phy = y_SMs*pixel_size_xy;
 z_SMs_phy = z_SMs*pixel_size_z;
@@ -105,8 +105,8 @@ x_grd(1:n_SMs) = x_SMs.'; y_grd(1:n_SMs) = y_SMs.';  x_phy(1:n_SMs) = x_SMs_phy.
 thetaD_grd(1:n_SMs) = thetaD_SMs.'; phiD_grd(1:n_SMs)=phiD_SMs.'; 
 gamma_grd(1:n_SMs) = gamma_SMs.'; I_grd(1:n_SMs) = signal_SMs.'; 
 
-background = rand(1)*2-1+background_avg;
-bkg_img = [ones(image_size,image_size)*background,ones(image_size,image_size)*background*(rand(1)*0.3+1.1)];
+background = background_avg;
+bkg_img = [ones(image_size,image_size)*background,ones(image_size,image_size)*background];
 bkg_img_up1 = imresize(bkg_img(:,1:image_size),[image_size,image_size]*upsampling_ratio,'box');  
 bkg_img_up2 = imresize(bkg_img(:,image_size+1:image_size*2),[image_size,image_size]*upsampling_ratio,'box');
 bkg_img_up(1,:,:)=bkg_img_up1;

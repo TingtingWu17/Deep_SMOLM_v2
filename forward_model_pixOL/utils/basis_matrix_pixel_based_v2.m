@@ -26,7 +26,8 @@ angleResize = imresize(angle_temp,upsamping);
 
 center = round(sampling_size/2);
 [psf_radus aa] = size(angleResize);
-angle_1(center-psf_radus/2+1:center+psf_radus/2,center-psf_radus/2+1:center+psf_radus/2)=angleResize(:,:);
+%angle_1(center-psf_radus/2+1:center+psf_radus/2,center-psf_radus/2+1:center+psf_radus/2)=angleResize(:,:);
+angle_1(219-48:378+48,219-48:378+48)=angleResize(:,:);
 angle_1 = ((angle_1/255)*2*pi)-pi;
 mask = exp(1i*angle_1);
 
