@@ -33,7 +33,7 @@
 
 % give the save address for generated data
 % ********************************
-save_folder = '/home/wut/Documents/Deep-SMOLM/data/opt_PSF_data_1000vs2/MC_simulation_20220630_SNR1000vs2_omega2_random_loc/'; 
+save_folder = '/home/wut/Documents/Deep-SMOLM/data/opt_PSF_data_1000vs2/MC_simulation_20220723_SNR500vs2_omega0_random_loc/'; 
 % ********************************
 image_size = 32;  % the pixel size of the simulation image (feel free to change it)
 upsampling_ratio  = 6;
@@ -51,7 +51,7 @@ h = h./max(max(h));
 %% user defined parameters
 
 n_images = 1; % the simulated image numbers (feel free to change it)
-signal= 1000; %(feel free to change it)
+signal= 500; %(feel free to change it)
 background=2 ; %(feel free to change it)
 %signal_sigma = 80;
 
@@ -73,6 +73,7 @@ for ii = 1:length(thetaD_simulate)
 
 
 for frame_cur = 1:frame_per_state
+    count = count+1;
 image_with_poission = zeros(2,image_size,image_size);
 image_with_poission_up = zeros(2,image_size*upsampling_ratio,image_size*upsampling_ratio);
 image_GT_up = zeros(5,image_size*upsampling_ratio,image_size*upsampling_ratio);
@@ -94,7 +95,7 @@ x_SMs = 0.0;%(1*rand(1)-1/2); %x location, in unit of pixles
 y_SMs = 0.0;%(1*rand(1)-1/2);%y location, in unit of pixles
 temp = (poissrnd(3,1,100)+normrnd(0,1,1,100)-0.5)*350; temp(temp<100)=[];
 %signal_SMs = temp(1:n_SMs);
-signal_SMs = 1000;
+signal_SMs = signal;
 x_SMs_phy = x_SMs*pixel_size;
 y_SMs_phy = y_SMs*pixel_size;
 

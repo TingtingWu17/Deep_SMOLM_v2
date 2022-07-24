@@ -33,7 +33,7 @@ clc;
 
 % give the save address for generated data
 % ********************************
-save_folder = '/home/wut/Documents/Deep-SMOLM/data/opt_PSF_data_1000vs2/validation_20220121_2SM_fixed_v2_seperation1to20_signal1000_gamma1/'; 
+save_folder = '/home/wut/Documents/Deep-SMOLM/data/opt_PSF_data_1000vs2/validation_20220722_2SM_fixed_v2_seperation1to20_signal500_gamma1/'; 
 % ********************************
 image_size = 56;  % the pixel size of the simulation image (feel free to change it)
 upsampling_ratio  = 6;
@@ -41,9 +41,9 @@ pmask = 'pixOL_v12.bmp';
 basis_matrix_opt = forward_model_opt(pmask, image_size);
 pixel_size = 58.6; %in unit of um
 
-%distance_differ_set = linspace(1,1000,30)/pixel_size; %in unit of pixel
-distance_differ_set = 180/pixel_size;
-frame_per_state = 3000;
+distance_differ_set = linspace(1,1000,30)/pixel_size; %in unit of pixel
+%distance_differ_set = 180/pixel_size;
+frame_per_state = 1000;
 %% user defined parameters
 %% gaussian filter
 h_shape = [7,7];
@@ -99,7 +99,7 @@ y_SMs = [y_SMs1,y_SMs2];
 
 temp = (poissrnd(3,1,100)+normrnd(0,1,1,100)-0.5)*350; temp(temp<100)=[];
 %signal_SMs = temp(1:n_SMs);
-signal_SMs = [1000,1000];
+signal_SMs = [signal,signal];
 x_SMs_phy = x_SMs*pixel_size;
 y_SMs_phy = y_SMs*pixel_size;
 
@@ -198,8 +198,7 @@ Iy_up = imresize(Iy,[image_size,image_size]*upsampling_ratio,'box');
 %save ground truth and image
 image_with_poission(1,:,:) = I_poissx;
 image_with_poission(2,:,:) = I_poissy;
-image_with_poission_up(1,:,:) = I_poissx_up;
-image_with_poission_up(2,:,:) = I_poissy_up;
+
 image_noiseless(1,:,:) = Ix;
 image_noiseless(2,:,:) = Iy;
 GT_list(1,:)=ones(size(x_phy))*ii;
@@ -210,16 +209,14 @@ GT_list(5,:)=thetaD_grd;
 GT_list(6,:)=phiD_grd;
 GT_list(7,:)=gamma_grd;
 
-image_with_poission_bkgdRmvd_up = image_with_poission_up-background;
 
-I_noise(ii,:,:) = [I_poissx,I_poissy];
-I_noiseless_save(ii,:,:) =[Ix,Iy];
-distance_differ_save(ii) = distance_differ_set(ii);
-GT_list_save(ii,:,:)=GT_list;
-% save([save_folder,'image_with_poission',num2str(ii),'.mat'],'image_with_poission');
-% save([save_folder,'image_with_poission_bkgdRmvd_up',num2str(ii),'.mat'],'image_with_poission_bkgdRmvd_up');
-% save([save_folder,'GT_list',num2str(ii),'.mat'],'GT_list');
-% save([save_folder,'image_noiseless',num2str(ii),'.mat'],'image_noiseless');
+% I_noise(ii,:,:) = [I_poissx,I_poissy];
+% I_noiseless_save(ii,:,:) =[Ix,Iy];
+% distance_differ_save(ii) = distance_differ_set(ii);
+% GT_list_save(ii,:,:)=GT_list;
+save([save_folder,'image_with_poission',num2str(ii),'.mat'],'image_with_poission');
+save([save_folder,'GT_list',num2str(ii),'.mat'],'GT_list');
+save([save_folder,'image_noiseless',num2str(ii),'.mat'],'image_noiseless');
 
 
 

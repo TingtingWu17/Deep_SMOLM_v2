@@ -1,6 +1,6 @@
-function [basis_matrix,mask,BFP_matrix] = basis_matrix_pixel_based_v2(Microscopy)
+function [basis_matrix] = basis_matrix_pixel_based_retrieved_w_z(Microscopy)
 
-name=Microscopy.mask;
+
 rot=Microscopy.rot;
 wavelength=Microscopy.wavelength;
 bfp_radius=Microscopy.bfp_radius;
@@ -15,28 +15,15 @@ pix_size=Microscopy.pix_size;
 upsamping=Microscopy.upsampling;
 pixelSizeUpsampling=Microscopy.pixelSizeUpsampling;
 
-%MaskResized=mask_resize(name,bfp_radius,rot,sampling_size);
 
-%1. generate the mask
-angle_temp = imread(name);
-angle_temp = rot90(angle_temp,rot);
-angle_1 = ones(sampling_size, sampling_size)*127;
-angle_temp = im2double(angle_temp,'indexed');
-angleResize = imresize(angle_temp,upsamping);
+zf = Microscopy.z;
+z2 = Microscopy.z2;
+xy_ind = Microscopy.xy_ind;
 
-center = round(sampling_size/2);
-[psf_radus aa] = size(angleResize);
-angle_1(center-psf_radus/2+1:center+psf_radus/2,center-psf_radus/2+1:center+psf_radus/2)=angleResize(:,:);
-%angle_1(219-48:378+48,219-48:378+48)=angleResize(:,:);
-angle_1 = ((angle_1/255)*2*pi)-pi;
-mask = exp(1i*angle_1);
 
 
 %2.a generate the basis image
-[basisImagex,basisImagey,BFP_image_x,BFP_image_y] = simDipole_v5(0,0,0,mask,sampling_size,wavelength,n1,n2,nh,NA,Magnitude,pix_size);
-%[basisImagex,basisImagey,BFP_image_x,BFP_image_y] = simDipole_190703(0,0,0,mask,sampling_size,wavelength,n1,n2,NA,Magnitude);
-
-
+[basisImagex,basisImagey,BFP_image_x,BFP_image_y,basisImagex_dx,basisImagey_dx,basisImagex_dy,basisImagey_dy] = simDipole_v5_retrieved_w_z(zf,z2,0,sampling_size,wavelength,n1,n2,nh,NA,Magnitude,pix_size,xy_ind,Microscopy.pmask_retrieve_name);
 %intensity = sum(sum(sum(basisImagex+basisImagey)))/3;
 basisx = basisImagex(sampling_size/2-image_size/2+1:sampling_size/2+image_size/2,sampling_size/2-image_size/2+1:sampling_size/2+image_size/2,:);
 basisy = basisImagey(sampling_size/2-image_size/2+1:sampling_size/2+image_size/2,sampling_size/2-image_size/2+1:sampling_size/2+image_size/2,:);
@@ -50,7 +37,7 @@ BFP_y = BFP_image_y(a/2-bfp_radius+1:a/2+bfp_radius,a/2-bfp_radius+1:a/2+bfp_rad
 intensity = 1/3*(sum(sum(basisx(:,:,1)))+sum(sum(basisy(:,:,1))))+1/3*(sum(sum(basisx(:,:,2)))+sum(sum(basisy(:,:,2))))+1/3*(sum(sum(basisx(:,:,3)))+sum(sum(basisy(:,:,3))));
 %intensity =1.1077e+10;
 basisx = basisx./intensity;   %normaliza basis images
-basisy = basisy./intensity;
+basisy = basisy./intensity*Microscopy.y2xratio;
 
 %2.b reshape the image to (75*75+75*75) by 6 matrix
 basis_matrix = zeros(image_size*image_size+image_size*image_size,6);
@@ -69,3 +56,5 @@ for i = 1:6
 end
 
 end
+
+
