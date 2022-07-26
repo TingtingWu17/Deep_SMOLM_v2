@@ -12,9 +12,9 @@ from data_loader.MicroscopyDataloader_est import MicroscopyDataLoader_est
 #from data_loader.MicroscopyDataloader_singleSM import MicroscopyDataLoader_singleSM as MicroscopyDataLoader
 from torch.utils.data import DataLoader
 import model.loss as module_loss
-import model.metric_v2 as module_metric
+import model.metric as module_metric
 #import model.model as module_arch
-import model.model_v2 as module_arch
+import model.model as module_arch
 #import model.resnet as module_arch
 from parse_config import ConfigParser
 from trainer.trainer_main import *
@@ -74,7 +74,7 @@ def main(config: ConfigParser):
 
 if __name__ == '__main__':
     args = argparse.ArgumentParser(description='training parameters')
-    args.add_argument('-c', '--config', default="config_orientations_v2.json", type=str,
+    args.add_argument('-c', '--config', default="config_orientations.json", type=str,
                       help='config file path (default: None)')
     args.add_argument('-r', '--resume', default="/home/wut/Documents/Deep-SMOLM/data/save/models/training_with_retrieve_pixOL_com_sym_89/0709_175726/model_best.pth", type=str,
                       help='path to latest checkpoint (default: None)')

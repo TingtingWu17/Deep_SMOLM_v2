@@ -12,7 +12,7 @@ from numpy import inf
 from trainer.trainer_utils import *
 from logger import CometWriter
 import scipy.io as sio
-from model.metric_v2 import postprocessing,postprocessingv2
+from model.metric import postprocessing,postprocessingv2
 
 
 

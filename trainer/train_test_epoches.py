@@ -5,7 +5,7 @@ from tqdm import tqdm_notebook as tqdm
 import matplotlib.pyplot as plt
 from numpy import inf
 from trainer.trainer_utils import *
-from model.metric_v2 import postprocessingv2
+from model.metric import postprocessingv2
 import model.loss as module_loss
 
 
