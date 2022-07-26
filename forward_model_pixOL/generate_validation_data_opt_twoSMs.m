@@ -41,8 +41,8 @@ pmask = 'pixOL_v12.bmp';
 basis_matrix_opt = forward_model_opt(pmask, image_size);
 pixel_size = 58.6; %in unit of um
 
-distance_differ_set = linspace(1,1000,30)/pixel_size; %in unit of pixel
-%distance_differ_set = 180/pixel_size;
+%distance_differ_set = linspace(1,1000,30)/pixel_size; %in unit of pixel
+distance_differ_set = 0/pixel_size;
 frame_per_state = 1000;
 %% user defined parameters
 %% gaussian filter
@@ -122,20 +122,20 @@ I_SMsx = I_SMs(1:image_size,1:image_size,:);
 I_SMsy = I_SMs(1:image_size,image_size+1:image_size*2,:);
 I_SMsy = flip(I_SMsy,2);
 
-% cut = 0.05;
-% Ix = I_SMs(1:end,1:56,1);
-% Iy = I_SMs(1:end,(1:56)+56,1);
-% Ix = Ix+imtranslate(Ix(:,:),[x_SMs(1),y_SMs(1)],'bicubic')*signal_SMs(1);
-% Iy = Iy+imtranslate(Iy(:,:),[x_SMs(1),y_SMs(1)],'bicubic')*signal_SMs(1);
-% I_SM1 = [Ix,Iy];
-% indx1 = [Ix,Iy]; indx1(indx1>cut*max(I_SM1,[],'all'))=1; indx1(indx1~=1)=0;
-% Ix = I_SMs(1:end,1:56,2);
-% Iy = I_SMs(1:end,(1:56)+56,2);
-% Ix = Ix+imtranslate(Ix(:,:),[x_SMs(2),y_SMs(2)],'bicubic')*signal_SMs(2);
-% Iy = Iy+imtranslate(Iy(:,:),[x_SMs(2),y_SMs(2)],'bicubic')*signal_SMs(2);
-% I_SM2 = [Ix,Iy];
-% indx2 = [Ix,Iy]; indx2(indx2>cut*max(I_SM2,[],'all'))=1; indx2(indx2~=1)=0;
-% overlap(ii) = sum(indx1.*indx2,'all')/(sum((indx1+indx2)/2,'all'));
+cut = 0.05;
+Ix = I_SMs(1:end,1:56,1);
+Iy = I_SMs(1:end,(1:56)+56,1);
+Ix = Ix+imtranslate(Ix(:,:),[x_SMs(1),y_SMs(1)],'bicubic')*signal_SMs(1);
+Iy = Iy+imtranslate(Iy(:,:),[x_SMs(1),y_SMs(1)],'bicubic')*signal_SMs(1);
+I_SM1 = [Ix,Iy];
+indx1 = [Ix,Iy]; indx1(indx1>cut*max(I_SM1,[],'all'))=1; indx1(indx1~=1)=0;
+Ix = I_SMs(1:end,1:56,2);
+Iy = I_SMs(1:end,(1:56)+56,2);
+Ix = Ix+imtranslate(Ix(:,:),[x_SMs(2),y_SMs(2)],'bicubic')*signal_SMs(2);
+Iy = Iy+imtranslate(Iy(:,:),[x_SMs(2),y_SMs(2)],'bicubic')*signal_SMs(2);
+I_SM2 = [Ix,Iy];
+indx2 = [Ix,Iy]; indx2(indx2>cut*max(I_SM2,[],'all'))=1; indx2(indx2~=1)=0;
+overlap(ii) = sum(indx1.*indx2,'all')/(sum((indx1+indx2)/2,'all'));
 
 %% generate the basis image
 I = ones(image_size,image_size*2)*background;
